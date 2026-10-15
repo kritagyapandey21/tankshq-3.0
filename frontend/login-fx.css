@@ -1,0 +1,48 @@
+/* Login: animated bull vs bear fight replaces the static artwork; page theme is unchanged. */
+.login-hero-art { display: none !important; }
+.fight-canvas { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
+.bot-fab { bottom: 100px; }
+.bot { bottom: 170px; }
+@media (max-width: 700px) { .bot-fab { bottom: 84px; } .bot { bottom: 154px; } }
+.resume-banner { margin: 16px 0 0; padding: 10px 14px; color: rgba(245,245,247,.8); font-size: 13px; text-align: center; border: 1px solid rgba(212,175,55,.35); border-radius: 10px; background: rgba(212,175,55,.1); }
+.resume-banner b { color: #f4d77b; font-family: "DM Mono", monospace; }
+.resume-banner a { color: #f4d77b; font-weight: 700; text-decoration: none; }
+.resume-banner[hidden] { display: none; }
+
+@media (max-width: 700px) {
+    .bot-fab { top: 16px; bottom: auto; left: auto; right: 104px; width: 44px; height: 44px; font-size: 19px; }
+    .bot { top: 68px; bottom: auto; left: 10px; right: 10px; width: auto; }
+}
+
+/* ===== PHONE LAYOUT (<= 700px only; desktop untouched) ===== */
+@media (max-width: 700px) {
+    .login-screen { overflow: hidden; }
+    .login-screen .brand-lockup { top: 14px; left: 14px; padding: 0; }
+    .login-screen .brand-name { font-size: 19px; }
+    .login-screen .brand-tagline { margin-top: 3px; font-size: 7.5px; letter-spacing: .1em; }
+    .login-back { top: 14px; right: 12px; min-height: 34px; padding: 0 14px; font-size: 12px; }
+    .bot-fab { top: 12px; right: 86px; width: 40px; height: 40px; font-size: 17px; }
+    .bot { top: 60px; }
+
+    /* see-through card so the bull and bear stay visible behind it */
+    .login-screen .login-stage { align-items: flex-start; padding-top: 74px; }
+    .login-screen .login-card { width: calc(100vw - 28px); min-width: 0; max-width: 360px; padding: 20px 16px 16px; border-radius: 20px;
+        background: rgba(255,255,255,.035); border-color: rgba(255,255,255,.14);
+        -webkit-backdrop-filter: blur(1.5px); backdrop-filter: blur(1.5px); box-shadow: 0 14px 40px rgba(0,0,0,.35); }
+    .login-screen .login-heading .eyebrow { margin-bottom: 6px; font-size: 9.5px; }
+    .login-screen .login-heading h1 { margin-bottom: 6px; font-size: 22px; }
+    .login-screen .login-heading > p:last-child { max-width: 260px; font-size: 12px; line-height: 1.45; }
+    .login-screen .login-form { gap: 5px; margin-top: 14px; }
+    .login-screen .form-label { margin-top: 2px; font-size: 12px; }
+    .login-screen .login-input-wrap, .login-screen .timezone-trigger { min-height: 44px; border-radius: 11px; background: rgba(0,0,0,.28); font-size: 14px; }
+    .login-screen .login-input { padding: 11px 12px; font-size: 14px; }
+    .login-screen .form-meta { min-height: 10px; }
+    .login-screen .btn-access { min-height: 46px; margin-top: 2px; border-radius: 11px; font-size: 14px; }
+    .login-screen .signup-copy { margin-top: 10px; font-size: 11px; }
+    .resume-banner { margin-top: 10px; padding: 8px 10px; font-size: 11.5px; }
+
+    /* bottom strip: tidy and out of the way of the fight */
+    .login-screen .sentiment-badge { bottom: 10px; padding: 6px 9px; transform: scale(.85); transform-origin: bottom; }
+    .login-screen .login-clock { bottom: 40px; font-size: 10px; }
+    .login-screen .login-footer { bottom: 8px; font-size: 7.5px; }
+}

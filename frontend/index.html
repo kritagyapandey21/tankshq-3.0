@@ -3,135 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TANIX AI 3.0 — Your Gateway to Intelligent Markets</title>
+    <title>TANIX AI 3.0 — Precise Algorithm To Trade Smarter</title>
     <meta name="description" content="TANIX AI 3.0 delivers AI-assisted trading signals, a private Telegram community and a money management guide for verified traders.">
-    <link rel="icon" type="image/jpeg" href="logo.jpg">
-    <link rel="stylesheet" href="site.css?v=1">
+    <link rel="icon" type="image/webp" href="assets/tanishq-logo.webp">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="site.css?v=2">
+    <link rel="stylesheet" href="extras.css?v=7">
+    <link rel="stylesheet" href="landing.css?v=15">
 </head>
-<body>
+<body class="landing">
     <canvas id="bgCanvas"></canvas>
+    <canvas id="moneyRain" aria-hidden="true"></canvas>
     <div class="scanline"></div>
 
-    <header class="site-nav">
-        <div class="container">
-            <a class="brand" href="index.html" aria-label="TANIX AI 3.0 home">
-                <div class="brand-name">TANIX <span>AI 3.0</span></div>
-                <div class="brand-tagline">Your Gateway to Intelligent Markets</div>
-            </a>
-            <nav class="nav-links" aria-label="Page sections">
-                <a href="#steps">How it works</a>
-                <a href="#features">What you get</a>
+    <!-- Left navigation rail -->
+    <aside class="rail" aria-label="Site navigation">
+        <div class="rail-group">
+            <a class="rail-logo" href="#hero" aria-label="Learn with Tanishq home"><img src="assets/tanishq-logo.webp" alt="" width="46" height="46"></a>
+            <nav>
+                <a class="ri" href="#hero"><i class="fa-solid fa-house"></i><span>Home</span></a>
+                                <a class="ri" href="#steps"><i class="fa-solid fa-route"></i><span>3-Step Access</span></a>
+                <a class="ri" href="#features"><i class="fa-solid fa-cubes"></i><span>Tanix Features</span></a>
+                <a class="ri" href="#winners"><i class="fa-solid fa-trophy"></i><span>Monthly Winners</span></a>
+                <a class="ri" href="#about"><i class="fa-solid fa-book-open"></i><span>About &amp; Learning</span></a>
             </nav>
-            <div class="nav-actions">
-                <a class="btn btn-gold" href="login.html">Get Private Access</a>
-            </div>
+        </div>
+        <div class="social">
+            <a class="ri" data-link="telegramUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
+            <a class="ri" data-link="youtubeUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+    </aside>
+
+    <header class="lp-header">
+        <a class="lp-brand" href="#hero" aria-label="Learn with Tanishq">
+            <span class="lp-mark"><img src="assets/tanishq-logo.webp" alt="Learn with Tanishq logo" width="64" height="64"></span>
+            <span class="lp-brand-text">
+                <span class="lp-brand-name">LEARN WITH <b>TANISHQ</b></span>
+            </span>
+        </a>
+        <div class="lp-header-right">
+            <a class="hd-soc yt" data-link="youtubeUrl" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i><span><b>YouTube</b><small>Follow for analysis</small></span></a>
+            <a class="hd-soc tg" data-link="telegramUrl" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i><span><b>Telegram</b><small>Join exclusive community</small></span></a>
+            <a class="btn btn-gold btn-pill" href="login.html"><i class="fa-solid fa-key"></i> Get Private Access</a>
         </div>
     </header>
 
-    <main>
-        <section class="hero">
-            <div class="hero-art" aria-hidden="true">
-                <img class="bull" src="assets/bull-portrait-sharp.webp" alt="" onerror="this.hidden=true">
-                <img class="bear" src="assets/bear-wireframe-cutout.webp" alt="" onerror="this.hidden=true">
-            </div>
-            <div class="container hero-inner">
-                <span class="badge"><span class="live-dot"></span> Live market intelligence</span>
-                <h1>Trade smarter with <span class="gold-text">TANIX AI 3.0</span></h1>
-                <p class="lede">An AI-assisted signal engine that reads Pocket Option price action in real time, backed by a private community and a money management playbook — built for verified traders.</p>
+    <main class="lp-main">
+        <!-- Hero -->
+        <section id="hero" class="glass hero-card">
+            <canvas id="heroCanvas" aria-hidden="true"></canvas>
+            <div class="inner">
+                <h1>Precise algorithm to make <span class="gold-text">more money &amp; trade smarter</span></h1>
+                <p class="lede">Automate high-probability setups, bypass retail liquidity traps, and follow true bank order flow with TANIX AI 3.0 proprietary signals.</p>
                 <div class="hero-cta">
-                    <a class="btn btn-gold" href="login.html">Get Private Access
+                    <a class="btn btn-gold" href="login.html">Get Private Access Now
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
                     </a>
-                    <a class="btn btn-ghost" href="#steps">See how it works</a>
-                </div>
-                <div class="hero-stats">
-                    <div><strong>RSI·EMA·MACD</strong><span>Weighted signal engine</span></div>
-                    <div><strong>1 MIN</strong><span>Live candle analysis</span></div>
-                    <div><strong>24/7</strong><span>Private community</span></div>
+                    <a class="btn btn-ghost" href="#about">Explore Free Guides</a>
                 </div>
             </div>
         </section>
 
-        <section class="section" id="steps">
-            <div class="container">
-                <div class="section-head">
-                    <p class="eyebrow">Get started</p>
-                    <h2>3 simple steps to private access</h2>
-                    <p>Access is limited to verified traders. Here is the path from visitor to member.</p>
-                </div>
-                <div class="grid grid-3">
-                    <article class="glass card">
-                        <span class="step-num">01</span>
-                        <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.4 3.1-5 7-5s6.2 1.6 7 5"/></svg></div>
-                        <h3>Get your Trader ID</h3>
-                        <p>Open your trading account through our partner link. The Trader ID on that account is your key to TANIX AI 3.0.</p>
-                    </article>
-                    <article class="glass card">
-                        <span class="step-num">02</span>
-                        <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5L15.5 10"/></svg></div>
-                        <h3>Log in &amp; verify</h3>
-                        <p>Press <b>Get Private Access</b>, enter your Trader ID and time zone. We verify it securely before opening the doors.</p>
-                    </article>
-                    <article class="glass card">
-                        <span class="step-num">03</span>
-                        <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3L5 13h6l-1 8 8-10h-6z"/></svg></div>
-                        <h3>Unlock your hub</h3>
-                        <p>Join the Telegram channel, open the TANIX 3.0 terminal for live signals, and study the money management guide.</p>
-                    </article>
-                </div>
+        <!-- Steps -->
+        <section id="steps">
+            <div class="center-head">
+                <h2>3 simple steps to get private access</h2>
+                <p>Follow the path below to unlock VIP signals and the automated algorithm desk.</p>
+            </div>
+            <div class="lp-grid c3">
+                <article class="glass lp-card"><span class="lp-num">01</span><div class="lp-icon"><i class="fa-solid fa-user-plus"></i></div><h3>1. Register</h3><p>Open your trading account through our partner link. Your Trader ID is your key to TANIX AI 3.0.</p></article>
+                <article class="glass lp-card"><span class="lp-num">02</span><div class="lp-icon"><i class="fa-solid fa-shield-halved"></i></div><h3>2. Verify</h3><p>Press <b>Get Private Access</b> and enter your Trader ID. Our system verifies your access securely.</p></article>
+                <article class="glass lp-card"><span class="lp-num">03</span><div class="lp-icon"><i class="fa-solid fa-bolt"></i></div><h3>3. Access</h3><p>Get full access to the TANIX 3.0 web app, the Telegram channel and the Money Guide from your member hub.</p></article>
             </div>
         </section>
 
-        <section class="section" id="features">
-            <div class="container">
-                <div class="section-head">
-                    <p class="eyebrow">Inside the platform</p>
-                    <h2>What you get with TANIX AI 3.0</h2>
-                    <p>Three tools, one membership — everything you need in a single member hub.</p>
-                </div>
-                <div class="grid grid-3">
-                    <article class="glass card">
-                        <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4L3 11l6 2.5L11.5 20l3-4.5L19 18z"/></svg></div>
-                        <h3>Private Telegram community</h3>
-                        <p>Daily market notes, announcements and trader discussion in a members-only channel.</p>
-                    </article>
-                    <article class="glass card">
-                        <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 8-9"/><path d="M15 5h5v5"/></svg></div>
-                        <h3>TANIX 3.0 signal terminal</h3>
-                        <p>Scan the market and receive a BUY or SELL signal with entry and expiry times, confidence and indicator breakdown.</p>
-                    </article>
-                    <article class="glass card">
-                        <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16.5 7.5C16.5 6 14.5 5 12 5s-4.5 1-4.5 2.8c0 4.4 9 2.2 9 6.6C16.5 16 14.5 17 12 17s-4.5-1-4.5-2.5"/></svg></div>
-                        <h3>Money management guide</h3>
-                        <p>Position sizing, daily loss limits and risk-to-reward rules that protect your capital first.</p>
-                    </article>
-                </div>
+        <!-- Features -->
+        <section id="features">
+            <div class="center-head">
+                <h2>What you get in TANIX AI 3.0</h2>
+                <p>A complete suite of tools built for consistent trading.</p>
+            </div>
+            <div class="lp-grid c2">
+                <article class="glass lp-card"><div class="lp-icon"><i class="fa-solid fa-robot"></i></div><h3>TANIX AI 3.0 Engine</h3><p>A signal algorithm that analyses live market data with RSI, EMA and MACD to generate clear BUY / SELL triggers with entry and expiry times.</p></article>
+                <article class="glass lp-card"><div class="lp-icon"><i class="fa-solid fa-paper-plane"></i></div><h3>Private Telegram Channel</h3><p>Announcements, market commentary and community discussion delivered straight to your phone.</p></article>
+                <article class="glass lp-card"><div class="lp-icon"><i class="fa-solid fa-chart-line"></i></div><h3>Risk &amp; Compounding Rules</h3><p>Risk management protocols engineered to protect your capital while growing your account systematically.</p></article>
+                <article class="glass lp-card"><div class="lp-icon"><i class="fa-solid fa-book"></i></div><h3>Money Management Guide</h3><p>Session discipline, position sizing and the psychological rules for modern markets — with a built-in calculator.</p></article>
             </div>
         </section>
 
-        <section class="section">
-            <div class="container">
-                <div class="glass cta">
-                    <h2>Ready to upgrade your trading system?</h2>
-                    <p>Log in with your verified Trader ID and step into the member hub.</p>
-                    <a class="btn btn-gold" href="login.html">Get Private Access
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
-                    </a>
-                </div>
+        <!-- Winners (podium cards) -->
+        <section id="winners">
+            <div class="center-head">
+                <p class="eyebrow">Leaderboard</p>
+                <h2><i class="fa-solid fa-trophy gold-text"></i> Last Month's Top Winners</h2>
+                <p>Our highest ROI community traders using TANIX AI 3.0.</p>
             </div>
+            <div class="win-cards" id="winCards"></div>
+            <div class="win-steps" aria-label="How to join the leaderboard">
+                <div class="glass"><b>01</b><i class="fa-solid fa-user-plus"></i><span>Register</span></div>
+                <div class="glass"><b>02</b><i class="fa-solid fa-shield-halved"></i><span>Verify</span></div>
+                <div class="glass"><b>03</b><i class="fa-solid fa-bolt"></i><span>Trade</span></div>
+            </div>
+            <p class="note">Results shown are community-reported. Past performance does not guarantee future results.</p>
+        </section>
+
+        <!-- About + learn guide + community -->
+        <section id="about" class="about-grid">
+            <aside class="glass learn" id="learning-material">
+                <h3>Learn Guide</h3>
+                <a class="learn-item" href="login.html"><span>Money Management Guide</span><i class="fa-solid fa-book"></i></a>
+                <a class="learn-item" href="login.html"><span>Orderflow &amp; Liquidity Blueprint</span><i class="fa-solid fa-magnifying-glass-chart"></i></a>
+                <a class="learn-item" href="login.html"><span>Master Strategy Manual</span><i class="fa-solid fa-file-pdf"></i></a>
+                <a class="learn-item" data-link="youtubeUrl" href="#" target="_blank" rel="noopener noreferrer"><span>Video Walkthrough</span><i class="fa-brands fa-youtube"></i></a>
+                <p class="learn-note">Guides open after login.</p>
+            </aside>
+
+            <div class="glass about-main">
+                <h2>About Learn With Tanishq</h2>
+                <div class="coins">
+                    <div class="coin"><i class="fa-solid fa-user"></i><img src="assets/founder.jpg" alt="Tanishq, founder" onerror="this.hidden=true"></div>
+                    <div class="coin gold"><img src="assets/tanishq-logo.webp" alt="Learn with Tanishq logo"></div>
+                </div>
+                <h3>ABOUT TANISHQ</h3>
+                <div class="role">Founder &amp; Head Algorithmic Architect</div>
+                <blockquote>&ldquo;After years of losing capital to retail liquidity traps, I spent 3 years engineering TANIX AI. Version 3.0 is built to give everyday traders the exact orderflow clarity used by institutional desks.&rdquo;</blockquote>
+                <button class="btn btn-ghost ask" type="button" id="askBot"><i class="fa-solid fa-robot"></i> Ask TANIX Assistant</button>
+            </div>
+
+            <aside class="about-side">
+                <div class="glass side-card">
+                    <h3><i class="fa-solid fa-trophy"></i> Monthly Top VIP Winners</h3>
+                    <div class="top-winner"><b>#1</b><span id="topName">--</span><em id="topRoi">--</em></div>
+                </div>
+                <div class="glass side-card">
+                    <h3>Community</h3>
+                    <div class="ticker">Live ticker: <b>12,400+</b> VIP members</div>
+                    <div class="soc">
+                        <a class="yt" data-link="youtubeUrl" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-youtube"></i> YouTube<small>Follow for analysis</small></a>
+                        <a class="tg" data-link="telegramUrl" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-telegram"></i> Telegram<small>Join exclusive community</small></a>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <!-- CTA -->
+        <section class="glass lp-cta">
+            <h2>Ready to upgrade your trading system?</h2>
+            <p>Get instant access to TANIX AI 3.0, the Telegram community and the complete money management guide.</p>
+            <a class="btn btn-gold" href="login.html"><i class="fa-solid fa-key"></i> Get Private Access</a>
         </section>
     </main>
 
-    <footer class="site-footer">
-        <div class="container" style="flex-direction:column">
-            <p class="risk">Trading binary and digital options involves substantial risk and can result in the loss of your invested capital. Signals are informational, not financial advice. Only trade with money you can afford to lose.</p>
-            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;width:100%">
-                <span>© 2026 TANIX AI 3.0. All rights reserved.</span>
-                <a href="login.html">Member login</a>
+    <footer class="lp-footer">
+        <div class="ft-glow" aria-hidden="true"></div>
+        <div class="ft-inner">
+            <div class="ft-top">
+                <div class="ft-brand">
+                    <div class="ft-logo"><span class="mark"><img src="assets/tanishq-logo.webp" alt="Learn with Tanishq logo" width="64" height="64"></span><div><div class="brand-name">LEARN WITH <span>TANISHQ</span></div><div class="brand-tagline">Your Gateway to Intelligent Markets</div></div></div>
+                    <p>AI-assisted trading signals, a private community and a money management playbook &mdash; built for traders who want clarity, not noise.</p>
+                    <div class="ft-social">
+                        <a data-link="telegramUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
+                        <a data-link="youtubeUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="login.html" aria-label="Member login"><i class="fa-solid fa-user-lock"></i></a>
+                    </div>
+                </div>
+                <nav class="ft-col" aria-label="Explore">
+                    <h4>Explore</h4>
+                    <a href="#hero">Home</a>
+                    <a href="#steps">How it works</a>
+                    <a href="#features">Features</a>
+                    <a href="#winners">Top winners</a>
+                </nav>
+                <nav class="ft-col" aria-label="Members">
+                    <h4>Members</h4>
+                    <a href="login.html">Log in</a>
+                    <a href="login.html">Signal terminal</a>
+                    <a href="login.html">Money guide</a>
+                    <a href="#about">About &amp; learning</a>
+                </nav>
+                <div class="ft-cta">
+                    <h4>Ready to start?</h4>
+                    <p>Log in with your verified Trader ID.</p>
+                    <a class="btn btn-gold" href="login.html">Get Private Access
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+                    </a>
+                </div>
             </div>
+            <div class="ft-bottom">
+                <span>&copy; 2026 TANIX AI 3.0. All rights reserved.</span>
+                <span class="ft-secure"><i class="fa-solid fa-lock"></i> Secure login (SSL)</span>
+                <a href="#hero" class="ft-top-link">Back to top <i class="fa-solid fa-arrow-up"></i></a>
+            </div>
+            <p class="risk">Trading binary and digital options involves substantial risk and can result in the loss of your invested capital. Signals are informational, not financial advice. Past results do not guarantee future performance.</p>
         </div>
     </footer>
 
-    <script src="app.js?v=4.2"></script>
+    <!-- Assistant -->
+    <button class="bot-fab" id="botFab" type="button" aria-label="Open TANIX assistant" aria-expanded="false"><i class="fa-solid fa-robot"></i></button>
+    <div class="glass bot" id="bot" role="dialog" aria-label="TANIX AI Assistant">
+        <div class="bot-head"><span><i class="fa-solid fa-robot"></i> TANIX AI Assistant</span><button type="button" id="botClose" aria-label="Close assistant"><i class="fa-solid fa-xmark"></i></button></div>
+        <div class="bot-log" id="botLog"><div class="msg">Hello! I'm the TANIX AI assistant. Ask me about access, the money guide or the Telegram channel.</div></div>
+        <form class="bot-form" id="botForm"><input id="botInput" type="text" placeholder="Ask a question..." autocomplete="off" aria-label="Your question"><button type="submit" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button></form>
+    </div>
+
+    <script>window.API_BASE_URL = '/api';</script>
+    <script src="config.js?v=4"></script>
+    <script src="app.js?v=4.3"></script>
+    <script src="extras.js?v=3"></script>
+    <script src="landing.js?v=6"></script>
+    <script src="fight.js?v=2"></script>
 </body>
 </html>

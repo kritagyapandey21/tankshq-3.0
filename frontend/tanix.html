@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TANIX AI 3.0 — Trading Terminal</title>
-    <link rel="icon" type="image/jpeg" href="/logo.jpg">
+    <link rel="icon" type="image/webp" href="assets/tanishq-logo.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=5.5">
+    <link rel="stylesheet" href="extras.css?v=7">
 </head>
 <body data-page="terminal">
     <canvas id="bgCanvas"></canvas>
@@ -16,7 +17,7 @@
 
     <div class="app" id="appScreen" style="display:flex;">
         <aside class="sidebar glass-panel" id="sidebar" aria-label="Primary navigation">
-            <div class="sidebar-brand"><span class="brand-mark-small">T</span><span>TANIX <b>AI 3.0</b></span></div>
+            <div class="sidebar-brand"><span class="brand-mark-small"><img src="assets/tanishq-logo.webp" alt="Learn with Tanishq logo"></span><span>TANIX <b>AI 3.0</b></span></div>
             <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Collapse navigation" aria-expanded="true">‹</button>
             <nav class="sidebar-nav">
                 <a class="nav-item nav-link" href="hub.html"><span class="nav-icon">⌂</span><span>Member Hub</span></a>
@@ -31,7 +32,7 @@
         <!-- Top Bar -->
         <header class="topbar">
             <div class="topbar-left">
-                <a class="mobile-hub-link" href="hub.html" aria-label="Back to member hub">‹ Hub</a>
+                <a class="back-pill" href="hub.html" aria-label="Back to member hub">&lsaquo; Back</a>
                 <div class="logo">
                     <div class="logo-text">
                         <span class="brand-name">TANIX <span>AI 3.0</span></span>
@@ -290,7 +291,8 @@
         window.API_BASE_URL = '/api';
     </script>
     <script src="config.js?v=1"></script>
-    <script src="app.js?v=4.2"></script>
+    <script src="app.js?v=4.3"></script>
+    <script src="extras.js?v=3"></script>
 </body>
 </html>
 

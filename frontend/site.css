@@ -204,7 +204,7 @@ h1, h2, h3 { margin: 0; letter-spacing: -.03em; }
     .avatar { width: 48px; height: 48px; margin-top: -40px; font-size: 18px; } .slot-1 .avatar { width: 58px; height: 58px; margin-top: -48px; font-size: 22px; }
     .guide-section { padding: 24px 20px; }
     .howto-step { padding: 20px; gap: 14px; }
-    .nav-actions .btn-ghost { display: none; }
+    .nav-actions { gap: 8px; } .nav-actions .btn { padding: 0 14px; min-height: 40px; font-size: 12px; } .back-pill { padding: 0 12px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
 
@@ -213,3 +213,47 @@ body.gated { visibility: hidden; }
 
 html, body { max-width: 100%; }
 .hero-art, .hero { overflow-x: clip; }
+
+/* ===== PHONE LAYOUT (<= 640px only; desktop untouched) ===== */
+@media (max-width: 640px) {
+    .site-nav .container { min-height: 58px; gap: 8px; }
+    .brand-name { font-size: 17px; white-space: nowrap; letter-spacing: .06em; }
+    .brand-tagline { font-size: 7.5px; letter-spacing: .1em; white-space: nowrap; }
+    .nav-actions { gap: 6px; flex: none; }
+    .nav-actions .btn, .back-pill { min-height: 34px; padding: 0 11px; font-size: 11.5px; white-space: nowrap; border-radius: 10px; }
+    .back-pill { border-radius: 999px; }
+    .trader-chip { display: none; }
+    .lede { font-size: 14px; line-height: 1.6; }
+    .eyebrow { font-size: 10px; margin-bottom: 8px; }
+    .section { padding-top: 44px; }
+    .section-head { margin-bottom: 22px; }
+    .section-head h2 { font-size: 22px; } .section-head p { font-size: 13px; margin-top: 8px; }
+    .welcome { padding-top: 28px; } .welcome h1 { font-size: 26px; } .welcome .lede { margin-top: 10px; }
+    .glass { border-radius: 16px; }
+    .card, .access-card { padding: 18px 16px; }
+    .card:hover, .access-card:hover { transform: none; }
+    .card h3 { font-size: 17px; } .card p { font-size: 13px; line-height: 1.55; }
+    .icon-box { width: 42px; height: 42px; margin-bottom: 12px; border-radius: 12px; } .icon-box svg { width: 21px; height: 21px; }
+    .access-card .tag { font-size: 10px; }
+    .access-card ul { margin-top: 10px; font-size: 12.5px; } .access-card li { padding: 2px 0; }
+    .access-card .go { padding-top: 14px; font-size: 13px; }
+    .grid { gap: 12px; }
+    .howto-steps { gap: 10px; }
+    .howto-step { padding: 14px; gap: 12px; border-radius: 14px; }
+    .howto-step .n { flex-basis: 34px; width: 34px; height: 34px; font-size: 14px; }
+    .howto-step h3 { font-size: 15px; } .howto-step p { font-size: 12.5px; line-height: 1.55; }
+    .note { font-size: 10.5px; margin-top: 14px; }
+    .site-footer { margin-top: 44px; padding: 20px 0 24px; font-size: 10px; }
+    .risk { font-size: 10.5px; }
+
+    /* guide */
+    .guide-layout { gap: 12px; padding-top: 22px; }
+    .guide-toc { padding: 14px; gap: 2px 14px; } .guide-toc a { padding: 5px 0; font-size: 12.5px; }
+    .guide-body { gap: 12px; }
+    .guide-section { padding: 18px 14px; }
+    .guide-section h2 { font-size: 18px; }
+    .guide-section p, .guide-section li { font-size: 13.5px; line-height: 1.65; }
+    .callout { padding: 12px 14px; font-size: 13px; }
+    .rule-table { font-size: 12px; } .rule-table th, .rule-table td { padding: 8px 6px; }
+    .calc { gap: 10px; } .calc input { min-height: 42px; font-size: 15px; } .calc-out { padding: 12px; font-size: 13px; } .calc-out b { font-size: 18px; }
+}

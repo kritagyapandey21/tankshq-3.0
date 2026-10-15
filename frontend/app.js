@@ -887,8 +887,13 @@ async function initLogin() {
         try {
             const response = await authenticatedFetch(`${API_BASE_URL}/session/heartbeat`, { method: 'POST' });
             if (!response.ok) throw new Error('expired');
-            location.replace('hub.html');
-            return;
+            // Already signed in: keep the login form visible, offer a shortcut instead of redirecting.
+            const banner = document.getElementById('resumeBanner');
+            if (banner) {
+                banner.querySelector('b').textContent = storedTraderId.toUpperCase();
+                banner.hidden = false;
+            }
+            loginInput.focus();
         } catch {
             clearSession();
             loginInput.focus();

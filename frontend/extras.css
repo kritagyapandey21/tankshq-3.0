@@ -1,0 +1,68 @@
+/* Falling money + assistant (shared by landing and login). */
+:root { --soft: rgba(245,245,247,.68); }
+#moneyRain { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100%; pointer-events: none; }
+#loginScreen #moneyRain { position: absolute; z-index: 1; }
+
+.bot-fab { position: fixed; left: var(--bot-left, 24px); bottom: 24px; z-index: 70; display: grid; width: 56px; height: 56px; place-items: center; color: #171108; font-size: 24px; cursor: pointer; border: 0; border-radius: 50%; background: linear-gradient(135deg, var(--gold-light), var(--gold)); box-shadow: 0 8px 30px rgba(212,175,55,.4); animation: fab 3s ease-in-out infinite; }
+@keyframes fab { 50% { box-shadow: 0 8px 44px rgba(212,175,55,.75); } }
+.bot { position: fixed; left: var(--bot-left, 24px); bottom: 94px; z-index: 70; display: none; flex-direction: column; width: min(380px, calc(100vw - var(--bot-left, 24px) - 16px)); overflow: hidden; border: 1px solid rgba(255,255,255,.18); border-radius: 20px; background: rgba(16,18,17,.92); box-shadow: 0 24px 70px rgba(0,0,0,.55), 0 0 50px rgba(212,175,55,.1); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); font-family: var(--font); }
+.bot.open { display: flex; }
+.bot-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; color: #171108; font-weight: 800; background: linear-gradient(110deg, var(--gold-deep), var(--gold-light), var(--gold)); }
+.bot-head button { color: #171108; cursor: pointer; border: 0; background: none; font-size: 16px; }
+.bot-log { display: flex; flex-direction: column; gap: 10px; height: 250px; padding: 14px; overflow-y: auto; color: var(--white); font-size: 13px; background: rgba(8,10,9,.7); }
+.msg { max-width: 85%; padding: 10px 13px; line-height: 1.5; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06); }
+.msg.me { align-self: flex-end; color: var(--gold-light); border-color: rgba(212,175,55,.28); background: rgba(212,175,55,.12); }
+.bot-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid rgba(212,175,55,.2); background: rgba(8,10,9,.85); }
+.bot-form input { flex: 1; min-width: 0; min-height: 42px; padding: 0 12px; color: var(--white); font: 14px var(--font); border: 1px solid rgba(212,175,55,.3); border-radius: 10px; background: rgba(0,0,0,.35); outline: 0; }
+.bot-form input:focus { border-color: var(--gold); }
+.bot-form button { width: 44px; color: #171108; cursor: pointer; border: 0; border-radius: 10px; background: linear-gradient(135deg, var(--gold-light), var(--gold)); }
+
+/* Back button (all inner pages) */
+.back-pill { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 18px; color: var(--gold-light, #f4d77b); font: 700 13px/1 var(--font, 'Manrope', sans-serif); letter-spacing: .04em; text-decoration: none; white-space: nowrap; border: 1px solid rgba(212,175,55,.35); border-radius: 999px; background: rgba(0,0,0,.35); transition: transform .2s, background .2s, border-color .2s; }
+.back-pill:hover { transform: translateX(-3px); border-color: var(--gold, #d4af37); background: rgba(212,175,55,.14); }
+.login-back { position: absolute; top: 30px; right: 36px; z-index: 6; }
+@media (max-width: 640px) { .login-back { top: 18px; right: 16px; } }
+
+/* Keep page content above the falling money */
+body > main, body > footer, body > .app { position: relative; z-index: 1; }
+.topbar-left .back-pill { flex: none; margin-right: 16px; }
+
+body[data-page="terminal"] .app { background: transparent; }
+
+/* Brand logo marks */
+.lp-mark, .rail-logo, .ft-logo .mark, .brand-mark-small { overflow: hidden; padding: 0; background: #000; border: 1.5px solid rgba(212,175,55,.7); box-shadow: 0 0 22px rgba(212,175,55,.38), inset 0 0 0 1px rgba(255,255,255,.08); }
+.lp-mark img, .rail-logo img, .ft-logo .mark img, .brand-mark-small img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.lp-mark { width: 66px !important; height: 66px !important; border-radius: 18px !important; }
+.rail-logo { width: 48px !important; height: 48px !important; border-radius: 14px !important; }
+.ft-logo .mark { width: 58px !important; height: 58px !important; border-radius: 16px !important; }
+.brand-mark-small { width: 38px !important; height: 38px !important; border-radius: 11px !important; }
+.lp-mark, .rail-logo { transition: transform .25s, box-shadow .25s; }
+.lp-brand:hover .lp-mark, .rail-logo:hover { transform: scale(1.06); box-shadow: 0 0 34px rgba(212,175,55,.6); }
+@media (max-width: 640px) { .lp-mark { width: 46px !important; height: 46px !important; border-radius: 13px !important; } .rail-logo { width: 40px !important; height: 40px !important; } }
+
+/* ===== TERMINAL PHONE LAYOUT (<= 700px only) ===== */
+@media (max-width: 700px) {
+    body[data-page="terminal"] .topbar { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+    body[data-page="terminal"] .topbar-left { flex: 1 1 auto; min-width: 0; }
+    body[data-page="terminal"] .logo-text .brand-name { font-size: 16px; white-space: nowrap; }
+    body[data-page="terminal"] .logo-text .brand-tagline { font-size: 7.5px; }
+    body[data-page="terminal"] .back-pill { min-height: 32px; padding: 0 12px; font-size: 12px; margin-right: 10px; }
+    body[data-page="terminal"] .topbar-right { flex: none; gap: 8px; }
+    body[data-page="terminal"] .clock-value { font-size: 12px; }
+    body[data-page="terminal"] .connection-status { font-size: 8.5px; gap: 5px; margin-left: 0; }
+    body[data-page="terminal"] .topbar-center { order: 3; width: 100%; margin-top: 6px; padding-top: 8px; }
+    body[data-page="terminal"] .control-panel { padding: 12px; gap: 10px; }
+    body[data-page="terminal"] .dashboard-panel { padding: 14px; }
+    body[data-page="terminal"] .panel-heading h2 { font-size: 16px; }
+}
+
+/* Scrollbars: dark + thin on desktop, hidden on phones */
+:root { color-scheme: dark; }
+html { scrollbar-width: thin; scrollbar-color: rgba(212,175,55,.6) #0a0f0d; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0a0f0d; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #8f6b18, #d4af37); border-radius: 8px; }
+@media (max-width: 700px) {
+    html, body { scrollbar-width: none; -ms-overflow-style: none; }
+    ::-webkit-scrollbar { display: none; width: 0; height: 0; }
+}
