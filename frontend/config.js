@@ -1,10 +1,17 @@
 // Site-wide settings for the landing page, member hub and guide.
 // Edit this file to change links and leaderboard data — no other code needs to change.
 window.TANIX_CONFIG = {
-    // TODO: replace with your real Telegram channel link.
-    telegramUrl: 'https://t.me/YOUR_CHANNEL',
-    // TODO: replace with your YouTube walkthrough link.
-    youtubeUrl: 'https://youtube.com',
+    telegramUrl: 'https://t.me/+PBet4OYnw681NTM1',
+    // Pocket Option sign-up link (put your affiliate/referral link here)
+    pocketSignupUrl: 'https://u3.shortink.io/register?utm_campaign=834817&utm_source=affiliate&utm_medium=sr&a=POY4xB1cswM8K7&al=1804652&ac=tanixai3&cid=986719&code=Tanishq',
+    telegramContactUrl: 'https://t.me/tanishbairagi',
+    youtubeUrl: 'https://youtube.com/@learn_with_tanishq',
+    instagramUrl: 'https://www.instagram.com/tanishq_vairagi',
+    // Learn Guide YouTube videos (paste your video links here)
+    guideMoneyUrl: 'https://youtube.com',
+    guideTanixUrl: 'https://youtube.com',
+    guidePocketUrl: 'https://youtube.com',
+    guideDepositUrl: 'https://youtube.com',
 
     // Best performers (podium). Order does not matter: the podium sorts by `roi`.
     // `photo` files are AI-generated placeholder faces (not real people). Replace with each

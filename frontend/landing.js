@@ -19,7 +19,6 @@
         parts.push(['div', 'medal', '']);
         parts.push(['div', 'place', places[i] + ' place']);
         parts.push(['div', 'nm', w.handle]);
-        parts.push(['div', 'st', w.strategy || '']);
         parts.push(['div', 'rr', '+' + Number(w.roi).toFixed(1) + '%']);
         parts.forEach(([tag, cls, text]) => { const e = document.createElement(tag); e.className = cls; e.textContent = text; c.appendChild(e); });
         // avatar photo: config `photo` if given, otherwise a generated portrait; falls back to the initial

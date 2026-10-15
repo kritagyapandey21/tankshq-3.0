@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css?v=5.5">
     <link rel="stylesheet" href="extras.css?v=7">
+    <link rel="stylesheet" href="traderid.css?v=1">
 </head>
 <body data-page="terminal">
     <canvas id="bgCanvas"></canvas>
@@ -43,7 +44,7 @@
             <div class="topbar-center">
                 <div id="traderBadge" class="trader-badge">
                     <span class="trader-label">TRADER</span>
-                    <span id="traderIdDisplay" class="trader-id">--</span>
+                    <span id="traderIdDisplay" class="trader-id" data-tid>--</span>
                 </div>
                 <div class="live-badge">
                     <span class="live-dot"></span>
@@ -290,9 +291,10 @@
     <script>
         window.API_BASE_URL = '/api';
     </script>
-    <script src="config.js?v=1"></script>
+    <script src="config.js?v=7"></script>
     <script src="app.js?v=4.3"></script>
     <script src="extras.js?v=3"></script>
+    <script src="traderid.js?v=1"></script>
 </body>
 </html>
 

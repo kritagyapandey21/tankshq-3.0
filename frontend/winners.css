@@ -1,0 +1,39 @@
+/* Winners podium cards (shared by landing page and member hub) */
+.win-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 260px)); justify-content: center; align-items: end; gap: 22px; padding-top: 30px; }
+.win-card { position: relative; padding: 26px 20px 22px; text-align: center; transition: transform .3s; }
+.win-card.p2 { transform: rotate(-4deg) translateY(10px); }
+.win-card.p3 { transform: rotate(4deg) translateY(10px); }
+.win-card.p1 { padding-top: 34px; transform: translateY(-22px) scale(1.07); border-color: rgba(212,175,55,.6); box-shadow: 0 30px 90px rgba(0,0,0,.55), 0 0 70px rgba(212,175,55,.25); }
+.win-card:hover { transform: translateY(-30px) scale(1.09) rotate(0); }
+.win-card .medal { display: grid; width: 74px; height: 74px; margin: 0 auto 14px; place-items: center; color: #171108; font-size: 26px; font-weight: 800; border-radius: 50%; border: 3px solid rgba(255,255,255,.2); }
+.p1 .medal { width: 88px; height: 88px; font-size: 32px; background: linear-gradient(135deg, #fce282, var(--gold) 60%, #8f6b18); box-shadow: 0 0 40px rgba(212,175,55,.55); }
+.p2 .medal { background: linear-gradient(135deg, #f1f1f4, #a9abb2); }
+.p3 .medal { background: linear-gradient(135deg, #e0a56b, #8d5a2b); }
+.win-card .crown { position: absolute; top: -26px; left: 50%; transform: translateX(-50%); color: var(--gold-light); font-size: 30px; filter: drop-shadow(0 0 12px rgba(212,175,55,.8)); }
+.win-card .place { color: var(--gold); font: 500 12px var(--mono); letter-spacing: .2em; text-transform: uppercase; }
+.win-card .nm { margin-top: 6px; font-size: 19px; font-weight: 800; word-break: break-word; }
+.win-card .st { margin-top: 4px; min-height: 36px; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+.win-card .rr { margin-top: 12px; color: var(--green); font: 500 28px var(--mono); }
+.win-card .rr small { display: block; color: var(--muted); font-size: 10px; letter-spacing: .14em; }
+.win-card .medal.has-photo { overflow: hidden; padding: 0; background: #1c1c1c; }
+.win-card .medal img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.p1 .medal.has-photo { border-color: var(--gold); }
+@media (max-width: 640px) {
+    .win-cards { grid-template-columns: minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr); gap: 8px; }
+    .win-card { padding: 16px 6px; } .win-card .nm { font-size: 12px; } .win-card .st { display: none; } .win-card .rr { font-size: 15px; }
+    .win-card .medal, .p1 .medal { width: 46px; height: 46px; font-size: 18px; } .win-card .crown { font-size: 22px; top: -20px; }
+}
+@media (max-width: 640px) {
+    .win-cards { gap: 6px; padding-top: 22px; }
+    .win-card { padding: 12px 4px 12px; border-radius: 14px; }
+    .win-card.p1 { padding-top: 18px; transform: translateY(-12px) scale(1.04); }
+    .win-card.p2 { transform: rotate(-3deg) translateY(6px); } .win-card.p3 { transform: rotate(3deg) translateY(6px); }
+    .win-card .place { font-size: 8.5px; letter-spacing: .1em; }
+    .win-card .nm { font-size: 11px; }
+    .win-card .rr { margin-top: 6px; font-size: 13px; }
+    .win-card .rr small { font-size: 8px; }
+    .win-card .medal, .p1 .medal { width: 38px; height: 38px; margin-bottom: 8px; font-size: 15px; }
+    .p1 .medal { width: 46px; height: 46px; font-size: 18px; }
+    .win-card .crown { top: -17px; font-size: 19px; }
+}
+#performers .win-cards { padding-bottom: 14px; } #performers .note { margin-top: 30px; }

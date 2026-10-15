@@ -206,7 +206,7 @@ body.landing { padding-left: 80px; }
 .lp-footer::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--gold-deep), var(--gold-light), var(--gold-deep), transparent); box-shadow: 0 0 22px rgba(212,175,55,.55); }
 .ft-glow { position: absolute; top: -140px; left: 50%; width: 760px; height: 280px; transform: translateX(-50%); pointer-events: none; background: radial-gradient(ellipse, rgba(212,175,55,.2), transparent 70%); }
 .ft-inner { position: relative; width: min(1180px, 100%); margin: 0 auto; padding-top: 64px; }
-.ft-top { display: grid; grid-template-columns: 1.6fr .8fr .8fr 1.3fr; gap: 40px; }
+.ft-top { display: grid; grid-template-columns: 1.6fr .8fr .8fr; gap: 40px; }
 .ft-logo { display: flex; align-items: center; gap: 14px; }
 .ft-logo .mark { display: grid; flex: none; width: 46px; height: 46px; place-items: center; color: var(--gold-light); font-size: 22px; font-weight: 800; border: 1px solid var(--gold-line); border-radius: 13px; background: var(--gold-wash); box-shadow: 0 0 24px rgba(212,175,55,.18); }
 .ft-logo .brand-name { font-size: 22px; }

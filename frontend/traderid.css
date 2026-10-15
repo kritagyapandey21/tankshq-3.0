@@ -1,0 +1,7 @@
+/* trader ID mask toggle */
+.tid-row { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 0 22px; }
+.tid-eye { position: absolute; right: 0; top: 50%; display: grid; place-items: center; width: 20px; height: 20px; padding: 0; color: var(--muted); background: none; border: 0; transform: translateY(-50%); cursor: pointer; }
+.tid-eye:hover { color: var(--gold-light); }
+.tid-eye svg { width: 15px; height: 15px; }
+.tid-eye .slash { opacity: 0; }
+.tid-eye.is-masked .slash { opacity: 1; }

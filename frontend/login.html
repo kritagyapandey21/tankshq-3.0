@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css?v=5.5">
     <link rel="stylesheet" href="extras.css?v=7">
-    <link rel="stylesheet" href="login-fx.css?v=6">
+    <link rel="stylesheet" href="login-fx.css?v=8">
 </head>
 <body data-page="login">
     <canvas id="bgCanvas"></canvas>
@@ -85,16 +85,30 @@
                 <div class="form-meta"><span id="loginError" class="login-error" role="alert" aria-live="polite"></span></div>
                 <button id="loginBtn" class="btn-access" type="submit"><span id="loginBtnText">INITIALIZE ACCESS</span><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
             </form>
+            <p class="signup-copy">Don't have a Pocket Option account?  <a id="pocketSignupLink" data-link="pocketSignupUrl" href="https://pocketoption.com" target="_blank" rel="noopener noreferrer">Sign up</a></p>
             <p class="signup-copy">Don't know how to use TANIX AI 3.0?  <a id="tutorialLink" href="index.html#steps">Click here</a></p>
         </main>
         </div>
         <div id="loginClock" class="login-clock" aria-live="polite">--:--:--</div>
-        <footer class="login-footer">© 2026 TANIX AI 3.0. All rights reserved. <span>Secure Login (SSL)</span></footer>
+        <footer class="login-footer">
+            <div class="lf-social">
+                <a data-link="telegramUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
+                <a data-link="youtubeUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                <a data-link="instagramUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            </div>
+            <div>© 2026 Learn With Tanishq. All rights reserved. <span>Secure Login (SSL)</span></div>
+        </footer>
     </div>
     <script>
         window.API_BASE_URL = '/api';
     </script>
-    <script src="config.js?v=1"></script>
+    <script src="config.js?v=7"></script>
+    <script>
+        (function () {
+            var cfg = window.TANIX_CONFIG || {};
+            document.querySelectorAll('[data-link]').forEach(function (el) { if (cfg[el.dataset.link]) el.href = cfg[el.dataset.link]; });
+        })();
+    </script>
     <script src="app.js?v=4.3"></script>
     <script src="extras.js?v=3"></script>
     <script src="fight.js?v=2"></script>

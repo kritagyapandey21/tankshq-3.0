@@ -46,3 +46,10 @@
     .login-screen .login-clock { bottom: 40px; font-size: 10px; }
     .login-screen .login-footer { bottom: 8px; font-size: 7.5px; }
 }
+
+/* login footer: social icons beside the copyright line */
+.login-footer { display: flex; align-items: center; justify-content: center; gap: 12px; white-space: nowrap; }
+.login-footer .lf-social { display: flex; gap: 8px; }
+.login-footer .lf-social a { display: grid; place-items: center; width: 1.9em; height: 1.9em; color: var(--gold-light); font-size: 1.15em; border: 1px solid var(--gold-line); border-radius: 50%; text-decoration: none; }
+.login-footer .lf-social a:hover { color: #171108; background: var(--gold-light); }
+@media (max-width: 520px) { .login-footer { flex-direction: column; gap: 4px; } .login-screen .login-clock { bottom: 62px; } }
