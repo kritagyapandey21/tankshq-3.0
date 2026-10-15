@@ -278,9 +278,10 @@ body.landing { --bot-left: 100px; }
 }
 @media (max-width: 640px) {
     .lp-header { max-width: 100%; }
-    .hd-soc { flex: none; width: 48px; padding: 0; }
-    .hd-soc span { display: none; }
-    .lp-header .btn-pill { flex: 1; min-width: 0; }
+    .hd-soc { flex: 1; min-width: 0; width: auto; padding: 0 10px; justify-content: center; }
+    .hd-soc span { display: grid; }
+    .hd-soc small { display: none; }
+    .lp-header-right { gap: 10px; }
 }
 
 /* ===== PHONE LAYOUT (<= 640px only; desktop untouched) ===== */
