@@ -1,0 +1,17 @@
+[Unit]
+Description=AUROX AI FastAPI backend
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/aurox/backend
+EnvironmentFile=/var/www/aurox/backend/.env
+Environment=TRADER_DB_PATH=/var/lib/aurox/trader_preferences.sqlite3
+ExecStart=/var/www/aurox/backend/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8001
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

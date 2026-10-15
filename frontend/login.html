@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Secure Login — TANIX AI 3.0</title>
+    <link rel="icon" type="image/jpeg" href="/logo.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=5.5">
+</head>
+<body data-page="login">
+    <canvas id="bgCanvas"></canvas>
+    <div class="scanline"></div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="market-backdrop" aria-hidden="true">
+            <div class="chart-grid"></div>
+            <svg class="trend-lines" viewBox="0 0 1440 820" preserveAspectRatio="none">
+                <path d="M-20 670 C180 590 250 700 430 560 S700 470 850 520 S1100 290 1460 140" />
+                <path class="trend-secondary" d="M-20 740 C230 630 350 720 510 680 S780 620 920 500 S1190 440 1460 360" />
+                <circle cx="432" cy="560" r="5" /><circle cx="850" cy="520" r="5" /><circle cx="1098" cy="290" r="5" />
+            </svg>
+            <div class="candles candles-left">
+                <span style="--x:3%;--h:92px;--t:38px;--c:up"></span><span style="--x:12%;--h:132px;--t:22px;--c:down"></span><span style="--x:21%;--h:76px;--t:70px;--c:up"></span><span style="--x:30%;--h:160px;--t:8px;--c:up"></span><span style="--x:39%;--h:105px;--t:45px;--c:down"></span><span style="--x:48%;--h:180px;--t:0px;--c:up"></span><span style="--x:57%;--h:120px;--t:36px;--c:up"></span>
+            </div>
+            <div class="candles candles-right">
+                <span style="--x:4%;--h:116px;--t:74px;--c:up"></span><span style="--x:16%;--h:170px;--t:18px;--c:up"></span><span style="--x:28%;--h:128px;--t:58px;--c:down"></span><span style="--x:40%;--h:196px;--t:0px;--c:up"></span><span style="--x:52%;--h:148px;--t:42px;--c:down"></span><span style="--x:64%;--h:224px;--t:4px;--c:up"></span><span style="--x:76%;--h:180px;--t:30px;--c:up"></span><span style="--x:88%;--h:240px;--t:0px;--c:down"></span>
+            </div>
+            <div class="market-panel">
+                <div class="market-panel-title"><span class="live-dot"></span> MARKET DATA <span>LIVE</span></div>
+                <div class="market-row"><span>BTC/USD</span><strong>68,450.21</strong><em>+0.72%</em></div>
+                <div class="market-row"><span>S&amp;P 500</span><strong>5,218.44</strong><em>+0.45%</em></div>
+                <div class="market-row"><span>ETH/USD</span><strong>3,820.45</strong><em>+1.24%</em></div>
+                <div class="market-row"><span>NASDAQ</span><strong>16,428.82</strong><em>+0.63%</em></div>
+            </div>
+            <div class="mini-chart"><span>BTC/USD</span><strong>68,450.21</strong><svg viewBox="0 0 210 55" preserveAspectRatio="none"><path d="M0 43 L18 38 L32 42 L48 27 L63 35 L78 24 L94 28 L111 16 L126 23 L143 13 L160 20 L179 8 L210 4" /></svg></div>
+            <div class="market-sparkle">✦</div>
+        </div>
+        <header class="brand-lockup">
+            <a href="index.html" class="brand-home-link" aria-label="Back to TANIX AI 3.0 home"><div><div class="brand-name">TANIX <span>AI 3.0</span></div><div class="brand-tagline">Your Gateway to Intelligent Markets</div></div></a>
+        </header>
+
+        <div class="login-sentiment-layer" aria-hidden="true">
+            <div class="sentiment-badge sentiment-bullish">
+                <span class="sentiment-dot"></span><span><b>BULLISH MOMENTUM</b><small>// +78%</small></span>
+            </div>
+            <div class="sentiment-badge sentiment-bearish">
+                <span class="sentiment-dot"></span><span><b>BEARISH HEDGE</b><small>// -22%</small></span>
+            </div>
+        </div>
+
+        <div class="login-stage">
+            <div class="login-glows" aria-hidden="true">
+                <span class="login-glow login-glow-gold"></span>
+                <span class="login-glow login-glow-green"></span>
+                <span class="login-glow login-glow-red"></span>
+            </div>
+            <div class="login-hero-art" aria-hidden="true">
+                <img class="login-animal login-bull-art" src="/assets/bull-portrait-sharp.webp" alt="" onerror="this.hidden=true">
+                <img class="login-animal login-bear-art" src="/assets/bear-wireframe-cutout.webp" alt="" onerror="this.hidden=true">
+            </div>
+        <main class="login-card glass-panel">
+            <div class="login-heading"><p class="eyebrow">SECURE MARKET ACCESS</p><h1>Welcome back, Trader</h1><p>Log in to your TANIX AI 3.0 account to continue your trading journey</p></div>
+            <form id="loginForm" class="login-form" novalidate>
+                <label class="form-label" for="traderIdInput">Trader ID</label>
+                <div class="login-input-wrap"><svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.4 3.1-5 7-5s6.2 1.6 7 5"/></svg><input id="traderIdInput" type="text" class="login-input" placeholder="Enter your trader ID" autocomplete="username" spellcheck="false" maxlength="32" required /></div>
+                <label class="form-label" for="timezoneSearch">Time Zone</label>
+                <div class="timezone-picker" id="timezonePicker">
+                    <button class="timezone-trigger" id="timezoneTrigger" type="button" aria-haspopup="listbox" aria-expanded="false">Select time zone</button>
+                    <div class="timezone-menu" id="timezoneMenu" role="listbox" hidden>
+                        <input id="timezoneSearch" class="timezone-search" type="search" placeholder="Search country, city or timezone" autocomplete="off" />
+                        <div id="timezoneOptions" class="timezone-options"></div>
+                    </div>
+                </div>
+                <div class="form-meta"><span id="loginError" class="login-error" role="alert" aria-live="polite"></span></div>
+                <button id="loginBtn" class="btn-access" type="submit"><span id="loginBtnText">INITIALIZE ACCESS</span><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+            </form>
+            <p class="signup-copy">Don't know how to use TANIX AI 3.0?  <a id="tutorialLink" href="index.html#steps">Click here</a></p>
+        </main>
+        </div>
+        <div id="loginClock" class="login-clock" aria-live="polite">--:--:--</div>
+        <footer class="login-footer">© 2026 TANIX AI 3.0. All rights reserved. <span>Secure Login (SSL)</span></footer>
+    </div>
+    <script>
+        window.API_BASE_URL = '/api';
+    </script>
+    <script src="config.js?v=1"></script>
+    <script src="app.js?v=4.2"></script>
+</body>
+</html>
+

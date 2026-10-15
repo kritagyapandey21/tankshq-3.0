@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Hub — TANIX AI 3.0</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="stylesheet" href="site.css?v=1">
+</head>
+<body class="gated" data-page="hub">
+    <canvas id="bgCanvas"></canvas>
+    <div class="scanline"></div>
+
+    <header class="site-nav">
+        <div class="container">
+            <a class="brand" href="hub.html" aria-label="TANIX AI 3.0 member hub">
+                <div class="brand-name">TANIX <span>AI 3.0</span></div>
+                <div class="brand-tagline">Member Hub</div>
+            </a>
+            <div class="nav-actions">
+                <div class="trader-chip"><span>TRADER</span><b data-trader-id>--</b></div>
+                <button class="btn btn-ghost" id="logoutBtn" type="button">Log out</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="welcome">
+            <div class="container">
+                <p class="eyebrow">Access granted</p>
+                <h1>Welcome back, <span class="gold-text">Trader</span></h1>
+                <p class="lede">Your verified ID <span class="id" data-trader-id>--</span> is active. Choose where to go next — everything you need is below.</p>
+            </div>
+        </section>
+
+        <section class="section" style="padding-top:44px" aria-labelledby="access-title">
+            <div class="container">
+                <h2 id="access-title" class="eyebrow">Your access</h2>
+                <div class="grid grid-3">
+                    <a class="glass card access-card" id="telegramCard" href="#" target="_blank" rel="noopener noreferrer">
+                        <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4L3 11l6 2.5L11.5 20l3-4.5L19 18z"/></svg></div>
+                        <span class="tag">Community</span>
+                        <h3>Join Telegram</h3>
+                        <p>Our private channel for market notes, announcements and updates. Opens in Telegram in a new tab.</p>
+                        <ul><li>Daily market commentary</li><li>Platform announcements</li><li>Trader discussion</li></ul>
+                        <span class="go">Join the channel <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+                    </a>
+                    <a class="glass card access-card featured" href="tanix.html">
+                        <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 8-9"/><path d="M15 5h5v5"/></svg></div>
+                        <span class="tag">Signal terminal</span>
+                        <h3>TANIX 3.0 Access</h3>
+                        <p>Open the live terminal. Scan the market and get a BUY or SELL signal with entry and expiry times.</p>
+                        <ul><li>Live Pocket Option 1M chart</li><li>RSI · EMA · MACD confidence</li><li>Entry &amp; expiry countdown</li></ul>
+                        <span class="go">Open terminal <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+                    </a>
+                    <a class="glass card access-card" href="guide.html">
+                        <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16.5 7.5C16.5 6 14.5 5 12 5s-4.5 1-4.5 2.8c0 4.4 9 2.2 9 6.6C16.5 16 14.5 17 12 17s-4.5-1-4.5-2.5"/></svg></div>
+                        <span class="tag">Education</span>
+                        <h3>Money Management Guide</h3>
+                        <p>The rules that keep you in the game: how much to risk, when to stop and how to size every trade.</p>
+                        <ul><li>Risk-per-trade rules</li><li>Daily loss &amp; profit limits</li><li>Built-in position calculator</li></ul>
+                        <span class="go">Read the guide <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="performers" aria-labelledby="performers-title">
+            <div class="container">
+                <div class="section-head">
+                    <p class="eyebrow">Leaderboard</p>
+                    <h2 id="performers-title">Best performers</h2>
+                    <p id="performersSub">The top community traders using TANIX AI 3.0.</p>
+                </div>
+                <div class="podium" id="podium" style="padding-top:110px"></div>
+                <p class="note">Past results do not guarantee future performance.</p>
+            </div>
+        </section>
+
+        <section class="section howto" id="how-to-use" aria-labelledby="howto-title">
+            <div class="container">
+                <div class="section-head">
+                    <p class="eyebrow">Getting started</p>
+                    <h2 id="howto-title">How to use TANIX AI 3.0</h2>
+                    <p>Follow these steps each session for the best experience.</p>
+                </div>
+                <div class="howto-steps">
+                    <div class="glass howto-step"><span class="n">1</span><div><h3>Join the Telegram channel</h3><p>Stay on top of announcements and market commentary. Check it before you start trading for the day.</p></div></div>
+                    <div class="glass howto-step"><span class="n">2</span><div><h3>Read the money management guide</h3><p>Decide your risk per trade and daily loss limit <em>before</em> you take a signal — not after.</p></div></div>
+                    <div class="glass howto-step"><span class="n">3</span><div><h3>Open the TANIX 3.0 terminal</h3><p>Press <b>Scan Market</b>. The engine reads live 1-minute candles and returns a pair, direction (BUY or SELL), confidence and indicator scores.</p></div></div>
+                    <div class="glass howto-step"><span class="n">4</span><div><h3>Enter at the entry time</h3><p>Watch the countdown. Place the trade on your broker at the entry time shown and set the expiry to match. Times follow the time zone you chose at login.</p></div></div>
+                    <div class="glass howto-step"><span class="n">5</span><div><h3>Wait for the next signal</h3><p>When the current signal expires, a "New signal available" notice appears. Never chase losses — stick to your limits.</p></div></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container" style="flex-direction:column">
+            <p class="risk">Trading involves substantial risk and can result in the loss of your invested capital. Signals are informational, not financial advice.</p>
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;width:100%">
+                <span>© 2026 TANIX AI 3.0. All rights reserved.</span>
+                <span>Secure session</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>window.API_BASE_URL = '/api';</script>
+    <script src="config.js?v=1"></script>
+    <script src="app.js?v=4.2"></script>
+    <script>
+        (function () {
+            const cfg = window.TANIX_CONFIG || {};
+            document.getElementById('telegramCard').href = cfg.telegramUrl || '#';
+
+            const ranked = [...(cfg.performers || [])].sort((a, b) => b.roi - a.roi).slice(0, 3);
+            const byPlace = { 1: ranked[0], 2: ranked[1], 3: ranked[2] };
+            const podium = document.getElementById('podium');
+            // Visual order on the podium: 2nd, 1st, 3rd.
+            [2, 1, 3].forEach(place => {
+                const p = byPlace[place];
+                if (!p) return;
+                const slot = document.createElement('div');
+                slot.className = 'podium-slot slot-' + place;
+                const card = document.createElement('div');
+                card.className = 'glass performer';
+                if (place === 1) {
+                    const crown = document.createElement('span');
+                    crown.className = 'crown'; crown.textContent = '♛'; crown.setAttribute('aria-hidden', 'true');
+                    card.appendChild(crown);
+                }
+                const avatar = document.createElement('div');
+                avatar.className = 'avatar'; avatar.textContent = p.handle.replace('@', '').charAt(0).toUpperCase();
+                const handle = document.createElement('div');
+                handle.className = 'handle'; handle.textContent = p.handle;
+                const strat = document.createElement('div');
+                strat.className = 'strategy'; strat.textContent = p.strategy || '';
+                const roi = document.createElement('div');
+                roi.className = 'roi'; roi.textContent = '+' + Number(p.roi).toFixed(1) + '%';
+                const small = document.createElement('small');
+                small.textContent = 'ROI';
+                roi.appendChild(small);
+                card.append(avatar, handle, strat, roi);
+                const base = document.createElement('div');
+                base.className = 'podium-base'; base.textContent = place;
+                slot.append(card, base);
+                podium.appendChild(slot);
+            });
+            if (cfg.performersMonth) {
+                document.getElementById('performersSub').textContent = cfg.performersMonth + "'s top community traders using TANIX AI 3.0.";
+            }
+
+            document.addEventListener('aurox:ready', () => document.body.classList.remove('gated'));
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Management Guide — TANIX AI 3.0</title>
+    <link rel="icon" type="image/jpeg" href="logo.jpg">
+    <link rel="stylesheet" href="site.css?v=1">
+</head>
+<body class="gated" data-page="guide">
+    <canvas id="bgCanvas"></canvas>
+    <div class="scanline"></div>
+
+    <header class="site-nav">
+        <div class="container">
+            <a class="brand" href="hub.html" aria-label="Back to member hub">
+                <div class="brand-name">TANIX <span>AI 3.0</span></div>
+                <div class="brand-tagline">Money Management Guide</div>
+            </a>
+            <div class="nav-actions">
+                <a class="btn btn-ghost" href="hub.html">‹ Member Hub</a>
+                <a class="btn btn-gold" href="tanix.html">Open Terminal</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="welcome" style="padding-top:48px">
+            <p class="eyebrow">Education</p>
+            <h1>Money <span class="gold-text">Management</span> Guide</h1>
+            <p class="lede">A signal tells you <em>what</em> to trade. Money management decides whether you are still trading next month. Read this once, then apply it to every session.</p>
+        </div>
+
+        <div class="guide-layout">
+            <nav class="glass guide-toc" aria-label="Guide sections">
+                <h2>Contents</h2>
+                <a href="#capital">1. Trading capital</a>
+                <a href="#risk">2. Risk per trade</a>
+                <a href="#limits">3. Daily limits</a>
+                <a href="#sizing">4. Position calculator</a>
+                <a href="#recovery">5. After a loss</a>
+                <a href="#habits">6. Daily checklist</a>
+            </nav>
+
+            <div class="guide-body">
+                <section class="glass guide-section" id="capital">
+                    <h2>1. Separate your trading capital</h2>
+                    <p>Only trade with money you can afford to lose. Keep it in its own account, apart from rent, bills and savings. If losing the balance would hurt your life, the balance is too large for trading.</p>
+                    <div class="callout">Rule of thumb: decide your trading capital once, then never top it up in the middle of a losing streak.</div>
+                </section>
+
+                <section class="glass guide-section" id="risk">
+                    <h2>2. Risk a small, fixed percentage per trade</h2>
+                    <p>Your stake on any single trade should be a small slice of your balance. Small stakes let you survive the losing streaks that every strategy has.</p>
+                    <table class="rule-table">
+                        <thead><tr><th>Style</th><th>Stake per trade</th><th>Best for</th></tr></thead>
+                        <tbody>
+                            <tr><td>Conservative</td><td>1% of balance</td><td>New traders, small accounts</td></tr>
+                            <tr><td>Standard</td><td>2% of balance</td><td>Most members</td></tr>
+                            <tr><td>Aggressive</td><td>3% (never more)</td><td>Experienced, strict discipline</td></tr>
+                        </tbody>
+                    </table>
+                    <p>Never increase the stake to "win it back". Stake size follows your rule, not your mood.</p>
+                </section>
+
+                <section class="glass guide-section" id="limits">
+                    <h2>3. Set daily limits and honour them</h2>
+                    <ul>
+                        <li><b>Daily loss limit:</b> stop for the day after losing 5–6% of your balance (about 3 losses at 2% each).</li>
+                        <li><b>Daily profit target:</b> consider stopping after a gain of 5–10%. Giving profits back is the most common mistake.</li>
+                        <li><b>Trade count:</b> cap the number of trades per day so you only take the best setups.</li>
+                    </ul>
+                    <div class="callout">Hitting a limit is a success of discipline, not a failure. Close the platform and come back tomorrow.</div>
+                </section>
+
+                <section class="glass guide-section" id="sizing">
+                    <h2>4. Position size calculator</h2>
+                    <p>Enter your balance and risk percentage to see your suggested stake and daily loss limit.</p>
+                    <div class="calc">
+                        <div><label for="balance">Account balance</label><input id="balance" type="number" min="0" step="any" inputmode="decimal" value="1000"></div>
+                        <div><label for="riskPct">Risk per trade (%)</label><input id="riskPct" type="number" min="0.1" max="10" step="0.1" inputmode="decimal" value="2"></div>
+                        <div><label for="maxLosses">Max losses per day</label><input id="maxLosses" type="number" min="1" max="20" step="1" inputmode="numeric" value="3"></div>
+                        <div class="calc-out" aria-live="polite">
+                            Suggested stake: <b id="outStake">--</b><br>
+                            Daily loss limit: <b id="outLimit">--</b>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass guide-section" id="recovery">
+                    <h2>5. After a loss</h2>
+                    <ul>
+                        <li>Pause for a few minutes. Do not re-enter immediately.</li>
+                        <li>Keep the same stake. Do not double up (no martingale) — it turns a normal losing streak into a wiped account.</li>
+                        <li>If you break a rule, stop trading for the day and write down why.</li>
+                    </ul>
+                </section>
+
+                <section class="glass guide-section" id="habits">
+                    <h2>6. Daily checklist</h2>
+                    <ul>
+                        <li>Check the Telegram channel for announcements.</li>
+                        <li>Write down today's stake and loss limit before the first trade.</li>
+                        <li>Take only signals you can enter at the exact entry time.</li>
+                        <li>Stop when you hit your loss limit, profit target or trade count.</li>
+                        <li>Review the day: did you follow your rules?</li>
+                    </ul>
+                    <div class="callout">Trading involves substantial risk of loss. This guide is educational and is not financial advice.</div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <span>© 2026 TANIX AI 3.0. All rights reserved.</span>
+            <a href="hub.html">Back to member hub</a>
+        </div>
+    </footer>
+
+    <script>window.API_BASE_URL = '/api';</script>
+    <script src="config.js?v=1"></script>
+    <script src="app.js?v=4.2"></script>
+    <script>
+        (function () {
+            const $ = id => document.getElementById(id);
+            const money = n => Number.isFinite(n) ? n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '--';
+            function calc() {
+                const balance = parseFloat($('balance').value);
+                const risk = parseFloat($('riskPct').value);
+                const losses = parseFloat($('maxLosses').value);
+                const stake = balance * risk / 100;
+                $('outStake').textContent = money(stake);
+                $('outLimit').textContent = money(stake * losses);
+            }
+            ['balance', 'riskPct', 'maxLosses'].forEach(id => $(id).addEventListener('input', calc));
+            calc();
+            document.addEventListener('aurox:ready', () => document.body.classList.remove('gated'));
+        })();
+    </script>
+</body>
+</html>

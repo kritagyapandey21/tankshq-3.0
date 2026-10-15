@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TANIX AI 3.0 — Trading Terminal</title>
+    <link rel="icon" type="image/jpeg" href="/logo.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=5.5">
+</head>
+<body data-page="terminal">
+    <canvas id="bgCanvas"></canvas>
+    <div class="scanline"></div>
+
+    <div class="app" id="appScreen" style="display:flex;">
+        <aside class="sidebar glass-panel" id="sidebar" aria-label="Primary navigation">
+            <div class="sidebar-brand"><span class="brand-mark-small">T</span><span>TANIX <b>AI 3.0</b></span></div>
+            <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Collapse navigation" aria-expanded="true">‹</button>
+            <nav class="sidebar-nav">
+                <a class="nav-item nav-link" href="hub.html"><span class="nav-icon">⌂</span><span>Member Hub</span></a>
+                <button class="nav-item active" type="button" data-nav="overview"><span class="nav-icon">◈</span><span>Overview</span></button>
+                <button class="nav-item" type="button" data-nav="signals"><span class="nav-icon">⌁</span><span>Signals</span></button>
+                <button class="nav-item" type="button" data-nav="markets"><span class="nav-icon">▦</span><span>Markets</span></button>
+                <button class="nav-item nav-logout" id="logoutBtn" type="button"><span class="nav-icon">⏻</span><span>Log out</span></button>
+            </nav>
+            <div class="sidebar-footer"><span class="sidebar-status-dot"></span><span>Secure session</span></div>
+        </aside>
+        <div class="workspace">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <a class="mobile-hub-link" href="hub.html" aria-label="Back to member hub">‹ Hub</a>
+                <div class="logo">
+                    <div class="logo-text">
+                        <span class="brand-name">TANIX <span>AI 3.0</span></span>
+                        <span class="brand-tagline">INTELLIGENT MARKETS</span>
+                    </div>
+                </div>
+            </div>
+            <div class="topbar-center">
+                <div id="traderBadge" class="trader-badge">
+                    <span class="trader-label">TRADER</span>
+                    <span id="traderIdDisplay" class="trader-id">--</span>
+                </div>
+                <div class="live-badge">
+                    <span class="live-dot"></span>
+                    <span>LIVE</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="server-clock">
+                    <div class="clock-label">GLOBAL MARKET TIME</div>
+                    <div id="serverTime" class="clock-value">--:--:--</div>
+                </div>
+                <div class="connection-status">
+                    <div class="status-ring">
+                        <span id="statusDot" class="status-dot"></span>
+                    </div>
+                    <span id="statusText">INIT</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+
+            <!-- Control Panel -->
+            <section class="control-panel">
+                <div class="terminal-line">
+                    <span class="prompt-prefix">&gt;_</span>
+                    <span id="infoText" class="prompt-text">Establishing neural link to markets...</span>
+                </div>
+                <div class="controls">
+                    <button id="signalBtn" class="btn-scan" disabled>
+                        <span class="btn-scan-border"></span>
+                        <span class="btn-scan-inner">
+                            <span class="btn-scan-icon" id="btnLoader">◈</span>
+                            <span class="btn-scan-text">SCAN MARKET</span>
+                        </span>
+                    </button>
+                    <button id="refreshTimeBtn" class="btn-ghost">⟳ SYNC</button>
+                </div>
+            </section>
+
+            <section id="terminalDashboard" class="terminal-dashboard" aria-label="TANIX AI 3.0 trading dashboard">
+                <div class="portfolio-bar glass-panel">
+                    <div class="portfolio-actions"><span id="newSignalNotice" class="new-signal-notice" aria-live="polite">NEW SIGNAL AVAILABLE</span><button id="newTradeButton" class="dashboard-btn primary" data-action="new-trade">＋ NEW TRADE</button></div>
+                </div>
+
+                <div class="trading-workspace">
+                    <section class="dashboard-panel market-chart-panel glass-panel">
+                        <div class="panel-heading"><div><span class="eyebrow">MARKET OVERVIEW</span><h2>Market Chart</h2></div></div>
+                        <div id="demoMarketView">
+                            <div class="market-stat-strip"><div><span>BTC/USD</span><strong>68,450.21</strong><em class="negative">-1.00%</em></div><div><span>S&amp;P 500</span><strong>5,218.44</strong><em class="positive">+12.45%</em></div><div><span>ETH/USD</span><strong>3,820.45</strong><em class="negative">-2.18%</em></div></div>
+                            <div class="chart-wrap"><canvas id="marketChart" aria-label="BTC USD market chart"></canvas><div id="chartTooltip" class="chart-tooltip" role="status"></div></div>
+                            <div class="chart-footer"><span>09:30</span><span>13:00</span><span>17:00</span><span>20:30</span><span class="chart-live"><i></i> DEMO FEED</span></div>
+                        </div>
+                        <div id="marketSignalView" class="market-signal-view" style="display:none;">
+                            <div class="market-signal-header"><div><span class="eyebrow">POCKET OPTION · 1M</span><strong id="marketSignalPair">---</strong></div><span id="marketSignalDirection" class="direction-badge">---</span></div>
+                            <div class="signal-chart-wrap"><canvas id="marketSignalChart" aria-label="Selected Pocket Option signal chart"></canvas></div>
+                            <div class="signal-timing"><div id="marketSignalDirectionCell" class="signal-direction-cell"><span>DIRECTION</span><strong id="marketSignalDirectionBelow">---</strong></div><div><span>ENTRY TIME</span><strong id="marketSignalEntry">--:--:--</strong></div><div><span>EXPIRY TIME</span><strong id="marketSignalExpiry">--:--:--</strong></div></div>
+                        </div>
+                    </section>
+
+                    <section class="dashboard-panel network-panel glass-panel neural-engine-panel">
+                        <div class="panel-heading"><div><span class="eyebrow">TANIX AI 3.0 / SIGNAL SYNTHESIS</span><h2>Live Neural Engine</h2></div><span class="panel-live"><i></i> LIVE</span></div>
+                        <div class="neural-visualizer" aria-label="Live neural engine signal synthesis" role="img">
+                            <div class="neural-grid"></div>
+                            <div class="neural-sweep"></div>
+                            <div class="neural-ring neural-ring-one"></div><div class="neural-ring neural-ring-two"></div><div class="neural-ring neural-ring-three"></div>
+                            <div class="neural-orbit" id="neuralOrbit" aria-hidden="true"></div>
+                            <div class="neural-core"><span class="neural-core-icon">✦</span></div>
+                            <span class="telemetry telemetry-top-left">[NODE_A: CONNECTED]</span><span class="telemetry telemetry-top-right">[SYNC_RATE: 99.4%]</span><span class="telemetry telemetry-bottom-left">[LATENCY: 12MS]</span><span class="telemetry telemetry-bottom-right">[WEIGHTS: ACTIVE]</span>
+                            <canvas id="correlationNetwork" aria-hidden="true"></canvas>
+                        </div>
+                        <div id="activePairs" class="active-pairs" aria-live="polite">Waiting for active Pocket Option pairs...</div>
+                        <div class="neural-status-bar"><span class="neural-activity-dot"></span><span id="neuralStatus" aria-live="polite">Ingesting Pocket Option ticks &amp; price action...</span><span class="neural-status-index" id="neuralStatusIndex">01 / 04</span></div>
+                        <div class="ai-insight neural-data-bridge" aria-hidden="true"><div class="ai-insight-title">TANIX AI INSIGHT <small>LIVE</small></div><p id="correlationInsight">Building relationships from the latest Pocket Option candles...</p><div class="insight-metrics"><span><b id="correlationConfidence">--%</b> CORRELATION</span><span><b id="correlationSentiment" class="positive">--</b> SENTIMENT</span><span><b id="correlationRisk" class="moderate">--</b> RISK</span></div></div>
+                    </section>
+
+                    <section class="dashboard-panel drivers-panel glass-panel">
+                        <div class="panel-heading"><div><span class="eyebrow">SIGNAL ENGINE</span><h2>Signal Drivers</h2></div><span class="panel-live"><i></i> LIVE</span></div>
+                        <div class="driver-status"><span>SELECTED SIGNAL</span><strong id="driverSignal">Waiting for scan</strong></div>
+                        <div class="indicators-list driver-indicators">
+                            <div class="indicator-row"><span class="ind-name">RSI</span><div class="ind-track"><div class="ind-fill" id="driverRsiScore"></div></div><span class="ind-pct" id="driverRsiPercent">--%</span></div>
+                            <div class="indicator-row"><span class="ind-name">EMA</span><div class="ind-track"><div class="ind-fill" id="driverEmaScore"></div></div><span class="ind-pct" id="driverEmaPercent">--%</span></div>
+                            <div class="indicator-row"><span class="ind-name">MACD</span><div class="ind-track"><div class="ind-fill" id="driverMacdScore"></div></div><span class="ind-pct" id="driverMacdPercent">--%</span></div>
+                        </div>
+                        <div class="driver-method"><span>HOW THE SIGNAL IS PREDICTED</span><p>RSI measures momentum, EMA confirms the trend, and MACD validates direction. Their weighted agreement produces the final BUY or SELL signal.</p></div>
+                    </section>
+                </div>
+
+            </section>
+
+            <!-- Signal Display -->
+            <section id="signalDisplay" class="signal-section" style="display:none;">
+                <div class="signal-grid">
+
+                    <!-- Left: Main Signal Card -->
+                    <div class="signal-main glass-panel">
+                        <div class="panel-corner tl"></div>
+                        <div class="panel-corner tr"></div>
+                        <div class="panel-corner bl"></div>
+                        <div class="panel-corner br"></div>
+
+                        <div class="signal-pair-header">
+                            <div class="pair-info">
+                                <div class="pair-badge">POCKET OPTION · 1M</div>
+                                <div class="pair-name" id="signalPair">---</div>
+                            </div>
+                            <div class="direction-badge" id="signalDirection">---</div>
+                        </div>
+
+                        <div class="signal-chart-wrap"><canvas id="signalChart" aria-label="Signal candle chart"></canvas></div>
+                        <div class="signal-timing">
+                            <div><span>DIRECTION</span><strong id="signalDirectionBelow">---</strong></div>
+                            <div><span>ENTRY TIME</span><strong id="signalEntryBelow">--:--:--</strong></div>
+                            <div><span>EXPIRY TIME</span><strong id="signalExpiryBelow">--:--:--</strong></div>
+                        </div>
+
+                        <!-- Confidence Ring -->
+                        <div class="confidence-container">
+                            <div class="ring-wrapper">
+                                <svg class="confidence-ring" viewBox="0 0 140 140">
+                                    <circle class="ring-track" cx="70" cy="70" r="58"/>
+                                    <circle class="ring-glow" cx="70" cy="70" r="58"/>
+                                    <circle class="ring-fill" id="confidenceRing" cx="70" cy="70" r="58"/>
+                                </svg>
+                                <div class="ring-center">
+                                    <div class="ring-value" id="signalConfidence">--%</div>
+                                    <div class="ring-label">CONFIDENCE</div>
+                                </div>
+                            </div>
+
+                            <div class="signal-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">PRICE</span>
+                                    <span class="meta-value" id="currentPrice">--</span>
+                                </div>
+                                <div class="meta-divider"></div>
+                                <div class="meta-item">
+                                    <span class="meta-label">GENERATED</span>
+                                    <span class="meta-value mono" id="generatedAt">--:--:--</span>
+                                </div>
+                                <div class="meta-divider"></div>
+                                <div class="meta-item">
+                                    <span class="meta-label">ENTRY TIME</span>
+                                    <span class="meta-value mono neon" id="entryTime">--:--:--</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">EXPIRY TIME</span>
+                                    <span class="meta-value mono neon" id="expiryTime">--:--:--</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Countdown + Indicators -->
+                    <div class="signal-side">
+                        <!-- Countdown Panel -->
+                        <div class="countdown-panel glass-panel">
+                            <div class="panel-corner tl"></div>
+                            <div class="panel-corner tr"></div>
+                            <div class="panel-corner bl"></div>
+                            <div class="panel-corner br"></div>
+                            <div class="section-label">TIME TO ENTRY</div>
+                            <div class="countdown-display">
+                                <svg class="countdown-svg" viewBox="0 0 110 110">
+                                    <circle class="cring-track" cx="55" cy="55" r="46"/>
+                                    <circle class="cring-glow" cx="55" cy="55" r="46"/>
+                                    <circle class="cring-fill" id="countdownRing" cx="55" cy="55" r="46"/>
+                                </svg>
+                                <div class="countdown-time" id="countdownTimer">00:00</div>
+                            </div>
+                        </div>
+
+                        <!-- Indicators Panel -->
+                        <div class="indicators-panel glass-panel">
+                            <div class="panel-corner tl"></div>
+                            <div class="panel-corner tr"></div>
+                            <div class="panel-corner bl"></div>
+                            <div class="panel-corner br"></div>
+                            <div class="section-label">NEURAL INDICATORS</div>
+                            <div class="indicators-list">
+                                <div class="indicator-row">
+                                    <span class="ind-name">RSI</span>
+                                    <div class="ind-track">
+                                        <div class="ind-fill" id="rsiScore"></div>
+                                    </div>
+                                    <span class="ind-pct" id="rsiPercent">--%</span>
+                                </div>
+                                <div class="indicator-row">
+                                    <span class="ind-name">EMA</span>
+                                    <div class="ind-track">
+                                        <div class="ind-fill" id="emaScore"></div>
+                                    </div>
+                                    <span class="ind-pct" id="emaPercent">--%</span>
+                                </div>
+                                <div class="indicator-row">
+                                    <span class="ind-name">MACD</span>
+                                    <div class="ind-track">
+                                        <div class="ind-fill" id="macdScore"></div>
+                                    </div>
+                                    <span class="ind-pct" id="macdPercent">--%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Error Display -->
+            <section id="errorDisplay" class="error-section" style="display:none;">
+                <div class="error-panel glass-panel">
+                    <div class="error-icon">⚠</div>
+                    <div class="error-title">SIGNAL FAILURE</div>
+                    <div id="errorMessage" class="error-msg">Connection failure</div>
+                    <button id="retryBtn" class="btn-ghost accent">⟳ RETRY</button>
+                </div>
+            </section>
+
+            <!-- Stats Row -->
+            <section class="stats-row">
+                <div class="stat-card glass-panel">
+                    <div class="stat-label">PAIRS ACTIVE</div>
+                    <div class="stat-value" id="pairsCount">--</div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-label">LAST UPDATE</div>
+                    <div class="stat-value" id="lastUpdate">--:--:--</div>
+                </div>
+                <div class="stat-card glass-panel">
+                    <div class="stat-label">DATA FEED</div>
+                    <div class="stat-value" id="cacheStatus">--</div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <span>TANIX AI 3.0 · INTELLIGENT MARKETS</span>
+        </footer>
+        </div>
+        <div class="signal-toast" id="signalToast" role="status" aria-live="polite"><span class="toast-mark">✦</span><span><b>New signal ready</b><small id="signalToastText">Market scan complete</small></span></div>
+    </div>
+
+    <script>
+        window.API_BASE_URL = '/api';
+    </script>
+    <script src="config.js?v=1"></script>
+    <script src="app.js?v=4.2"></script>
+</body>
+</html>
+
