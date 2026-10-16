@@ -87,7 +87,7 @@ INFO:     Uvicorn running on http://0.0.0.0:8000
 In a new terminal:
 ```bash
 cd trading-signal-system/frontend
-python -m http.server 3000
+python dev_server.py 3000
 ```
 
 You should see:

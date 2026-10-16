@@ -20,4 +20,4 @@ echo ""
 echo "Press Ctrl+C to stop the server"
 echo ""
 
-python3 -m http.server 3000
+python3 dev_server.py 3000

@@ -11,13 +11,13 @@ self.addEventListener('push', event => {
         icon: 'assets/tanishq-logo.webp',
         badge: 'assets/tanishq-logo.webp',
         tag: 'daily-trade-reminder',
-        data: { url: data.url || '/hub.html' },
+        data: { url: data.url || '/hub' },
     }));
 });
 
 self.addEventListener('notificationclick', event => {
     event.notification.close();
-    const target = new URL((event.notification.data && event.notification.data.url) || '/hub.html', self.location.origin).href;
+    const target = new URL((event.notification.data && event.notification.data.url) || '/hub', self.location.origin).href;
     event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
         for (const client of list) {
             if (client.url.startsWith(self.location.origin) && 'focus' in client) { client.navigate(target); return client.focus(); }

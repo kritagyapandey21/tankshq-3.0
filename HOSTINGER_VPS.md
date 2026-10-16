@@ -2,7 +2,7 @@
 
 One server, one domain:
 
-- Website: `https://YOUR_DOMAIN/` (static files from `frontend/`, served by Nginx)
+- Website: `https://YOUR_DOMAIN/` (static files from `frontend/`, served by Nginx with clean URLs such as `/login` and `/hub`)
 - API: `https://YOUR_DOMAIN/api/...` (Nginx proxies to FastAPI on `127.0.0.1:8001`)
 
 The pages call `/api` on the same domain, so there is nothing to configure in the frontend and no CORS to worry about.
@@ -125,7 +125,7 @@ curl -X POST https://example.com/api/push/test -H "X-Admin-Key: YOUR_ADMIN_KEY"
 
 ## Admin page: updating the best performers
 
-Open `https://example.com/admin.html`, enter the `ADMIN_KEY` from the server's `.env`, and edit the winners (name, ROI, photo, period label). Changes appear on the landing page and member hub immediately, with no redeploy.
+Open `https://example.com/admin`, enter the `ADMIN_KEY` from the server's `.env`, and edit the winners (name, ROI, photo, period label). Changes appear on the landing page and member hub immediately, with no redeploy.
 
 - Set a **long random `ADMIN_KEY`** on the server (`openssl rand -hex 32`). Without it the admin page cannot sign in.
 - Winner photos are saved in `/var/lib/aurox/uploads/` (next to the database). Include that folder in your backups.

@@ -162,3 +162,19 @@ def set_telegram_joined(trader_id: str) -> None:
             """,
             (trader_id.casefold(),),
         )
+
+
+def list_telegram_joined() -> list:
+    """Traders who opened the Telegram channel from the hub, newest first (for the admin page)."""
+    with _connect() as connection:
+        rows = connection.execute(
+            "SELECT trader_id, updated_at FROM trader_flags WHERE telegram_joined = 1 ORDER BY updated_at DESC"
+        ).fetchall()
+    return [{"trader_id": r[0].upper(), "joined_at": r[1].replace(" ", "T") + "Z"} for r in rows]
+
+
+def reset_telegram_joined(trader_id: str) -> bool:
+    """Take a trader off the 'already opened Telegram' list so the card shows again. True if they were on it."""
+    with _connect() as connection:
+        cursor = connection.execute("DELETE FROM trader_flags WHERE trader_id = ?", (trader_id.casefold(),))
+        return cursor.rowcount > 0

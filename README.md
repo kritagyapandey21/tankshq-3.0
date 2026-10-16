@@ -107,7 +107,7 @@ cd frontend
 2. Serve files using Python's built-in server:
 ```bash
 # Python 3
-python -m http.server 3000
+python dev_server.py 3000
 
 # Python 2
 python -m SimpleHTTPServer 3000
@@ -532,7 +532,7 @@ python app.py
 
 # Terminal 2: Start frontend
 cd frontend
-python -m http.server 3000
+python dev_server.py 3000
 ```
 
 ### Production Deployment

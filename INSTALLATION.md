@@ -136,10 +136,10 @@ In a new terminal/prompt:
 cd frontend
 
 # Windows
-python -m http.server 3000
+python dev_server.py 3000
 
 # macOS/Linux
-python3 -m http.server 3000
+python3 dev_server.py 3000
 ```
 
 Expected output:

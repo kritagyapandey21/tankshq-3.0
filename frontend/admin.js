@@ -123,6 +123,66 @@
         status('Saved. The website is updated.', 'ok');
     }
 
+    // ---------------------------------------------------------------- tabs
+    function openTab(name) {
+        document.querySelectorAll('.ad-tab').forEach(t => {
+            const on = t.dataset.tab === name;
+            t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on));
+        });
+        $('tab-performers').hidden = name !== 'performers';
+        $('tab-telegram').hidden = name !== 'telegram';
+        if (name === 'telegram') loadTelegram();
+    }
+    document.querySelectorAll('.ad-tab').forEach(t => t.addEventListener('click', () => openTab(t.dataset.tab)));
+
+    // ---------------------------------------------------------------- telegram access list
+    let tgTraders = [];
+    const tgStatus = (msg, kind) => { $('tgStatus').textContent = msg || ''; $('tgStatus').className = 'ad-status' + (kind ? ' ' + kind : ''); };
+
+    function renderTelegram() {
+        const q = $('tgSearch').value.trim().toUpperCase();
+        const list = tgTraders.filter(t => !q || t.trader_id.includes(q));
+        const body = $('tgBody');
+        body.textContent = '';
+        list.forEach(t => {
+            const tr = document.createElement('tr');
+            const id = document.createElement('td'); id.textContent = t.trader_id;
+            const when = document.createElement('td'); when.textContent = new Date(t.joined_at).toLocaleString();
+            const act = document.createElement('td');
+            const btn = document.createElement('button');
+            btn.type = 'button'; btn.className = 'ad-tg-remove'; btn.textContent = 'Remove';
+            btn.addEventListener('click', () => removeTelegram(t.trader_id, btn));
+            act.appendChild(btn);
+            tr.append(id, when, act);
+            body.appendChild(tr);
+        });
+        $('tgCount').textContent = String(tgTraders.length);
+        $('tgEmpty').hidden = list.length > 0;
+        $('tgEmpty').textContent = tgTraders.length ? 'No Trader ID matches your search.' : 'No traders on the list yet.';
+    }
+
+    async function loadTelegram(keepStatus) {
+        if (keepStatus !== true) tgStatus('');
+        const r = await api('/admin/telegram-joins');
+        if (!r.ok) return tgStatus(r.status === 403 ? 'Admin key rejected. Lock and sign in again.' : 'Could not load the list.', 'err');
+        tgTraders = r.body.traders || [];
+        renderTelegram();
+    }
+
+    async function removeTelegram(traderId, btn) {
+        if (!confirm('Remove ' + traderId + ' from the list?\n\nThe "Join Telegram" card will show again for this trader on their next visit.')) return;
+        btn.disabled = true;
+        const r = await api('/admin/telegram-joins/remove', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ trader_id: traderId }),
+        });
+        btn.disabled = false;
+        if (!r.ok && r.status !== 404) return tgStatus(typeof r.body.detail === 'string' ? r.body.detail : 'Could not remove.', 'err');
+        tgStatus(traderId + ' removed. Their Join Telegram card will show again.', 'ok');
+        loadTelegram(true);
+    }
+    $('tgSearch').addEventListener('input', renderTelegram);
+    $('tgRefresh').addEventListener('click', () => loadTelegram());
+
     // ---------------------------------------------------------------- sign in
     function show(unlocked) {
         loginCard.hidden = unlocked; editor.hidden = !unlocked; lockBtn.hidden = !unlocked;
@@ -135,7 +195,7 @@
         if (r.status === 403) { setKey(''); adminKey = ''; if (!quiet) { err.textContent = 'Wrong admin key (or the server has no ADMIN_KEY set).'; err.hidden = false; } return; }
         if (!r.ok) { if (!quiet) { err.textContent = 'Something went wrong. Try again.'; err.hidden = false; } return; }
         setKey(key); err.hidden = true;
-        show(true); load(r.body);
+        show(true); load(r.body); loadTelegram();
     }
 
     $('loginForm').addEventListener('submit', e => { e.preventDefault(); unlock($('adminKey').value.trim(), false); });

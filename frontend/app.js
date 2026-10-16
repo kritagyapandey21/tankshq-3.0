@@ -962,7 +962,7 @@ async function initLogin() {
         // Store trader ID and continue to the member hub
         sessionStorage.setItem('aurox_trader_id', id);
         loginScreen.classList.add('fade-out');
-        setTimeout(() => { location.href = 'hub.html'; }, 450);
+        setTimeout(() => { location.href = 'hub'; }, 450);
     }
 
     loginForm.addEventListener('submit', event => { event.preventDefault(); doLogin(); });
@@ -1048,7 +1048,7 @@ async function wasSessionReplaced(response) {
 
 function doLogout(expired = true, replaced = false) {
     const token = sessionStorage.getItem(SESSION_TOKEN_KEY);
-    const finish = () => { location.replace(replaced ? 'login.html?expired=replaced' : expired ? 'login.html?expired=1' : 'login.html'); };
+    const finish = () => { location.replace(replaced ? 'login?expired=replaced' : expired ? 'login?expired=1' : 'login'); };
     clearInterval(sessionHeartbeatInterval);
     clearTimeout(inactivityTimer);
     clearSession();
@@ -1069,18 +1069,18 @@ function startInactivityWatcher() {
 async function requireSession() {
     const traderId = sessionStorage.getItem('aurox_trader_id');
     const token = sessionStorage.getItem(SESSION_TOKEN_KEY);
-    if (!traderId || !token) { location.replace('login.html'); return null; }
+    if (!traderId || !token) { location.replace('login'); return null; }
     try {
         const response = await authenticatedFetch(`${API_BASE_URL}/session/heartbeat`, { method: 'POST' });
         if (!response.ok) {
             const replaced = await wasSessionReplaced(response);
             clearSession();
-            location.replace(replaced ? 'login.html?expired=replaced' : 'login.html?expired=1');
+            location.replace(replaced ? 'login?expired=replaced' : 'login?expired=1');
             return null;
         }
     } catch (error) {
         // Only an explicit rejection ends the session; a network blip keeps it.
-        if (error.message === 'expired') { clearSession(); location.replace('login.html?expired=1'); return null; }
+        if (error.message === 'expired') { clearSession(); location.replace('login?expired=1'); return null; }
     }
     state.timezone = localStorage.getItem(`aurox_timezone_${traderId.toUpperCase()}`) || state.timezone;
     const display = document.getElementById('traderIdDisplay');

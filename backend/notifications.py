@@ -31,7 +31,7 @@ NOTIFY_TIME = os.environ.get("NOTIFY_TIME", "10:00").strip()
 NOTIFY_TZ = os.environ.get("NOTIFY_TZ", DEFAULT_TIMEZONE).strip() or DEFAULT_TIMEZONE
 VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "mailto:admin@example.com").strip()
 SEND_WINDOW_HOURS = 3        # if the server was down at NOTIFY_TIME, still send for up to this long afterwards
-SITE_URL_PATH = "/hub.html"  # where a tap on the notification lands
+SITE_URL_PATH = "/hub"  # where a tap on the notification lands
 
 # Short, encouraging, and honest: discipline and risk control, never promises of profit.
 MESSAGES: List[str] = [

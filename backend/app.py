@@ -46,6 +46,7 @@ from timezone_utils import DEFAULT_TIMEZONE, is_valid_timezone, normalize_timezo
 from trader_store import (
     get_timezone, set_timezone, claim_session, touch_session, release_session,
     trader_for_token, get_telegram_joined, set_telegram_joined, was_replaced,
+    list_telegram_joined, reset_telegram_joined,
 )
 
 # Configure logging
@@ -933,6 +934,33 @@ async def admin_upload_photo(request: Request, file: UploadFile = File(...), x_a
         return {"photo": performers.save_upload(data)}
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+
+
+class TraderRef(BaseModel):
+    trader_id: str
+
+
+@app.get("/admin/telegram-joins")
+@limiter.limit("60/minute")
+async def admin_telegram_joins(request: Request, x_admin_key: Optional[str] = Header(None)) -> Dict:
+    """Traders who opened the Telegram channel after login (their hub card is hidden)."""
+    require_admin(x_admin_key)
+    items = list_telegram_joined()
+    return {"count": len(items), "traders": items}
+
+
+@app.post("/admin/telegram-joins/remove")
+@limiter.limit("60/minute")
+async def admin_telegram_remove(request: Request, body: TraderRef, x_admin_key: Optional[str] = Header(None)) -> Dict:
+    """Remove a trader from the list so the Join Telegram card shows for them again."""
+    require_admin(x_admin_key)
+    trader_id = body.trader_id.strip()
+    if not trader_id or len(trader_id) > 64:
+        raise HTTPException(status_code=400, detail="Invalid Trader ID")
+    if not reset_telegram_joined(trader_id):
+        raise HTTPException(status_code=404, detail="That Trader ID is not on the list")
+    logger.info("Admin removed %s from the Telegram-opened list", trader_id.upper())
+    return {"removed": True}
 
 
 @app.get("/uploads/{name}")

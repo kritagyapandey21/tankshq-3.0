@@ -32,6 +32,6 @@ echo.
 echo Press Ctrl+C to stop the server
 echo.
 
-"%PYTHON_EXE%" -m http.server 3000
+"%PYTHON_EXE%" dev_server.py 3000
 
 pause

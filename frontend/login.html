@@ -20,7 +20,7 @@
 
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
-        <a class="back-pill login-back" href="index.html" aria-label="Back to home">&lsaquo; Back</a>
+        <a class="back-pill login-back" href="./" aria-label="Back to home">&lsaquo; Back</a>
         <canvas id="moneyRain" aria-hidden="true"></canvas>
         <canvas id="heroCanvas" class="fight-canvas" data-scale="0.3" data-mscale="0.72" data-base="0.9" aria-hidden="true"></canvas>
         <div class="market-backdrop" aria-hidden="true">
@@ -47,7 +47,7 @@
             <div class="market-sparkle">✦</div>
         </div>
         <header class="brand-lockup">
-            <a href="index.html" class="brand-home-link" aria-label="Back to TANIX AI 3.0 home"><div><div class="brand-name">LEARN WITH <span>TANISHQ</span></div><div class="brand-tagline">Your Gateway to Intelligent Markets</div></div></a>
+            <a href="./" class="brand-home-link" aria-label="Back to TANIX AI 3.0 home"><div><div class="brand-name">LEARN WITH <span>TANISHQ</span></div><div class="brand-tagline">Your Gateway to Intelligent Markets</div></div></a>
         </header>
 
         <div class="login-sentiment-layer" aria-hidden="true">
@@ -71,7 +71,7 @@
             </div>
         <main class="login-card glass-panel">
             <div class="login-heading"><p class="eyebrow">SECURE MARKET ACCESS</p><h1>Welcome back, Trader</h1><p>Log in to your TANIX AI 3.0 account to continue your trading journey</p></div>
-            <p id="resumeBanner" class="resume-banner" hidden>Signed in as <b></b> &middot; <a href="hub.html">Continue to hub &rarr;</a></p>
+            <p id="resumeBanner" class="resume-banner" hidden>Signed in as <b></b> &middot; <a href="hub">Continue to hub &rarr;</a></p>
             <form id="loginForm" class="login-form" novalidate>
                 <label class="form-label" for="traderIdInput">Trader ID</label>
                 <div class="login-input-wrap"><svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.4 3.1-5 7-5s6.2 1.6 7 5"/></svg><input id="traderIdInput" type="text" class="login-input" placeholder="Enter your trader ID" autocomplete="username" spellcheck="false" maxlength="32" required /></div>
@@ -87,7 +87,7 @@
                 <button id="loginBtn" class="btn-access" type="submit"><span id="loginBtnText">INITIALIZE ACCESS</span><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
             </form>
             <p class="signup-copy">Don't have a Pocket Option account?  <a id="pocketSignupLink" data-link="pocketSignupUrl" href="https://pocketoption.com" target="_blank" rel="noopener noreferrer">Sign up</a></p>
-            <p class="signup-copy">Don't know how to use TANIX AI 3.0?  <a id="tutorialLink" href="index.html#steps">Click here</a></p>
+            <p class="signup-copy">Don't know how to use TANIX AI 3.0?  <a id="tutorialLink" href="./#steps">Click here</a></p>
         </main>
         </div>
         <div id="loginClock" class="login-clock" aria-live="polite">--:--:--</div>
@@ -110,7 +110,7 @@
             document.querySelectorAll('[data-link]').forEach(function (el) { if (cfg[el.dataset.link]) el.href = cfg[el.dataset.link]; });
         })();
     </script>
-    <script src="app.js?v=5.2"></script>
+    <script src="app.js?v=5.3"></script>
     <script src="extras.js?v=4"></script>
     <script src="fight.js?v=3"></script>
 </body>

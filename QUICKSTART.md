@@ -66,7 +66,7 @@ Backend should start on: http://localhost:8000
 ### Step 2: Frontend Setup (in a new terminal)
 ```bash
 cd frontend
-python3 -m http.server 3000
+python3 dev_server.py 3000
 ```
 
 Frontend should start on: http://localhost:3000
@@ -90,7 +90,7 @@ python app.py
 ### Step 2: Frontend (new terminal)
 ```bash
 cd frontend
-python -m http.server 3000
+python dev_server.py 3000
 ```
 
 ### Step 3: Browser

@@ -19,7 +19,7 @@
               '<div><b>LEARN WITH <span>TANISHQ</span></b><small>Your gateway to intelligent markets</small></div>' +
             '</div>' +
             '<nav class="sf-links" aria-label="Footer">' +
-              '<a href="index.html">Home</a><a href="hub.html">Member hub</a><a href="tanix.html">Signal terminal</a><a href="guide.html">Money guide</a>' +
+              '<a href="./">Home</a><a href="hub">Member hub</a><a href="tanix">Signal terminal</a><a href="guide">Money guide</a>' +
             '</nav>' +
             '<div class="sf-social">' +
               social('telegram', cfg.telegramUrl, 'Telegram') + social('youtube', cfg.youtubeUrl, 'YouTube') + social('instagram', cfg.instagramUrl, 'Instagram') +

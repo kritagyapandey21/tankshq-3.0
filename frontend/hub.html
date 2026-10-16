@@ -21,7 +21,7 @@
 
     <header class="site-nav">
         <div class="container">
-            <a class="brand brand-logo" href="hub.html" aria-label="Learn With Tanishq member hub">
+            <a class="brand brand-logo" href="hub" aria-label="Learn With Tanishq member hub">
                 <img src="assets/tanishq-logo.webp" alt="" width="48" height="48">
                 <span class="brand-copy">
                     <div class="brand-name">LEARN WITH <span>TANISHQ</span></div>
@@ -29,7 +29,7 @@
                 </span>
             </a>
             <div class="nav-actions">
-                <a class="back-pill" href="index.html" aria-label="Back to home">&lsaquo; Back</a>
+                <a class="back-pill" href="./" aria-label="Back to home">&lsaquo; Back</a>
                 <div class="trader-chip"><span>TRADER ID</span><b data-tid>--</b></div>
                 <button class="btn btn-ghost" id="logoutBtn" type="button">Log out</button>
             </div>
@@ -55,7 +55,7 @@
                         <ul><li>Accurate live trade signals</li><li>Entry &amp; expiry times</li><li>Market updates &amp; announcements</li></ul>
                         <span class="go">Join the channel <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
                     </a>
-                    <a class="glass card access-card featured" href="tanix.html">
+                    <a class="glass card access-card featured" href="tanix">
                         <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l5-6 4 3 8-9"/><path d="M15 5h5v5"/></svg></div>
                         <span class="tag">Signal terminal</span>
                         <h3>TANIX 3.0 Access</h3>
@@ -63,7 +63,7 @@
                         <ul><li>Live Pocket Option 1M chart</li><li>RSI · EMA · MACD confidence</li><li>Entry &amp; expiry countdown</li></ul>
                         <span class="go">Open terminal <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
                     </a>
-                    <a class="glass card access-card" href="money.html">
+                    <a class="glass card access-card" href="money">
                         <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16.5 7.5C16.5 6 14.5 5 12 5s-4.5 1-4.5 2.8c0 4.4 9 2.2 9 6.6C16.5 16 14.5 17 12 17s-4.5-1-4.5-2.5"/></svg></div>
                         <span class="tag">Tool</span>
                         <h3>Money Management Tool</h3>
@@ -124,10 +124,10 @@
 
     <script>window.API_BASE_URL = '/api';</script>
     <script src="config.js?v=7"></script>
-    <script src="app.js?v=5.2"></script>
+    <script src="app.js?v=5.3"></script>
     <script src="extras.js?v=4"></script>
     <script src="traderid.js?v=1"></script>
-    <script src="footer.js?v=1"></script>
+    <script src="footer.js?v=2"></script>
     <script src="performers.js?v=1"></script>
     <script src="notify.js?v=3"></script>
     <script>
@@ -136,28 +136,32 @@
             const telegramCard = document.getElementById('telegramCard');
             telegramCard.href = cfg.telegramUrl || '#';
 
-            // Once a trader has opened the Telegram channel, the card is not shown to them again.
-            // The flag is saved on the server (follows the trader across devices); localStorage is a fast fallback.
+            // Once a trader has opened the Telegram channel, the card is hidden for them.
+            // The server is the source of truth (an admin can reset a trader, which shows the card again);
+            // localStorage only avoids a flash of the card while the server answers.
             const tgKey = 'tanix_tg_joined_' + (sessionStorage.getItem('aurox_trader_id') || '').toUpperCase();
             const accessGrid = telegramCard.parentElement;
-            function hideTelegramCard() {
-                telegramCard.remove();
-                const left = accessGrid.children.length;
-                if (left === 2) accessGrid.classList.add('grid-2');
+            function setTelegramCardHidden(hidden) {
+                telegramCard.style.display = hidden ? 'none' : '';   // (the card's own display style overrides the hidden attribute)
+                const visible = [...accessGrid.children].filter(c => c.style.display !== 'none').length;
+                accessGrid.classList.toggle('grid-2', visible === 2);
             }
+            const remember = on => { try { on ? localStorage.setItem(tgKey, '1') : localStorage.removeItem(tgKey); } catch (e) { /* storage unavailable */ } };
             let tgSeen = false;
-            try { tgSeen = localStorage.getItem(tgKey) === '1'; } catch (e) { /* storage unavailable */ }
-            if (tgSeen) hideTelegramCard();
-            else {
-                authenticatedFetch(`${API_BASE_URL}/trader/flags`)
-                    .then(r => r.ok ? r.json() : null)
-                    .then(f => { if (f && f.telegram_joined && telegramCard.isConnected) { try { localStorage.setItem(tgKey, '1'); } catch (e) {} hideTelegramCard(); } })
-                    .catch(() => { /* offline: keep the card */ });
-            }
+            try { tgSeen = localStorage.getItem(tgKey) === '1'; } catch (e) { /* ignore */ }
+            if (tgSeen) setTelegramCardHidden(true);
+            authenticatedFetch(`${API_BASE_URL}/trader/flags`)
+                .then(r => r.ok ? r.json() : null)
+                .then(f => {
+                    if (!f) return;                                   // server unreachable: keep what we have
+                    remember(f.telegram_joined);
+                    setTelegramCardHidden(!!f.telegram_joined);       // admin reset -> card comes back
+                })
+                .catch(() => { /* offline: keep the current state */ });
             telegramCard.addEventListener('click', () => {
-                try { localStorage.setItem(tgKey, '1'); } catch (e) { /* ignore */ }
+                remember(true);
                 authenticatedFetch(`${API_BASE_URL}/trader/telegram-joined`, { method: 'POST', keepalive: true }).catch(() => {});
-                setTimeout(hideTelegramCard, 400);   // let the new tab open first
+                setTimeout(() => setTelegramCardHidden(true), 400);   // let the new tab open first
             });
 
             // Best performers: list set on the admin page (falls back to config.js)
