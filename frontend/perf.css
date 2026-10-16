@@ -1,0 +1,17 @@
+/* Performance overrides: loaded last on every page. */
+/* Cheaper blur: the heavy radius is what makes scrolling stutter. */
+.glass { backdrop-filter: blur(12px) saturate(130%); -webkit-backdrop-filter: blur(12px) saturate(130%); }
+.site-nav { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+/* Promote the always-moving layers so they animate on the GPU instead of repainting. */
+.scanline, #bgCanvas, #moneyRain { will-change: transform; transform: translateZ(0); }
+
+/* Phones: no backdrop blur at all (the most expensive effect), slightly more solid panels instead. */
+@media (max-width: 900px) {
+    *, *::before, *::after { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+    .glass, .glass-panel, .login-card, .site-nav { background-color: rgba(18, 20, 19, .86); }
+    .scanline { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}

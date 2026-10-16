@@ -424,3 +424,52 @@ a.nav-item { text-decoration: none; }
 .brand-home-link { color: inherit; text-decoration: none; }
 .mobile-hub-link { display: none; margin-right: 12px; padding: 7px 11px; color: var(--gold-light); font: 11px var(--mono); text-decoration: none; border: 1px solid var(--gold-line); border-radius: 20px; }
 @media (max-width: 700px) { .mobile-hub-link { display: inline-block; } }
+
+/* Neural engine: keep every orbit a true circle.
+   The orbit area is a centred square (side = visualizer height), so percentage sizes give equal width and height. */
+.neural-orbit { inset: auto; top: 50%; left: 50%; width: auto; height: 100%; aspect-ratio: 1 / 1; transform: translate(-50%, -50%); }
+.orbit-track-0 { width: 52%; height: auto; aspect-ratio: 1 / 1; }
+.orbit-track-1 { width: 72%; height: auto; aspect-ratio: 1 / 1; }
+.orbit-track-2 { width: 92%; height: auto; aspect-ratio: 1 / 1; }
+.neural-visualizer::after { display: none; }   /* decorative tilted oval */
+
+/* Signal Drivers: futuristic radar HUD */
+.drivers-panel { --drv: var(--gold-light); --drv-rgb: 244,215,123; position: relative; overflow: hidden; }
+.drivers-panel.is-buy { --drv: var(--green); --drv-rgb: 57,229,140; }
+.drivers-panel.is-sell { --drv: var(--ruby); --drv-rgb: 224,91,107; }
+.drivers-panel::before { position: absolute; inset: 0; z-index: 0; content: ''; pointer-events: none; background: radial-gradient(ellipse at 30% 55%, rgba(var(--drv-rgb), .12), transparent 55%), repeating-linear-gradient(90deg, rgba(var(--drv-rgb), .035) 0 1px, transparent 1px 28px), repeating-linear-gradient(0deg, rgba(var(--drv-rgb), .035) 0 1px, transparent 1px 28px); transition: background .6s; }
+.drivers-panel > * { position: relative; z-index: 1; }
+.drv-hud { display: grid; grid-template-columns: minmax(200px, 270px) minmax(0, 1fr); gap: 22px; align-items: center; }
+.hud-radar svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 0 14px rgba(var(--drv-rgb), .3)); }
+.hud-rings circle { fill: none; stroke: rgba(var(--drv-rgb), .28); stroke-width: 1; stroke-dasharray: 3 5; }
+.hud-rings circle:first-child { stroke-dasharray: none; stroke: rgba(var(--drv-rgb), .45); }
+.hud-axes line { stroke: rgba(255,255,255,.18); stroke-width: 1; }
+.hud-sweep { transform-origin: 130px 125px; animation: hud-sweep 5s linear infinite; }
+.hud-poly { fill: url(#hudFill); stroke: var(--drv); stroke-width: 2; stroke-linejoin: round; filter: drop-shadow(0 0 8px var(--drv)); }
+.hud-dots circle { fill: #fff; stroke: var(--drv); stroke-width: 2; filter: drop-shadow(0 0 6px var(--drv)); animation: hud-pulse 2s ease-in-out infinite; }
+.hud-labels text { fill: var(--drv); font: 600 11px 'DM Mono', monospace; letter-spacing: .2em; }
+@keyframes hud-sweep { to { transform: rotate(360deg); } }
+@keyframes hud-pulse { 50% { r: 6; opacity: .7; } }
+.hud-side { display: grid; gap: 14px; }
+.hud-verdict span, .hud-conf-top span { color: rgba(255,255,255,.5); font: 9px 'DM Mono', monospace; letter-spacing: .24em; }
+.hud-verdict b { display: block; margin-top: 2px; color: var(--drv); font: 800 34px/1.05 'Manrope', sans-serif; letter-spacing: .08em; text-shadow: 0 0 22px rgba(var(--drv-rgb), .7); }
+.hud-verdict b.buy { color: var(--green); }
+.hud-verdict b.sell { color: var(--ruby); }
+.hud-conf-top { display: flex; align-items: baseline; justify-content: space-between; }
+.hud-conf-top b { color: #fff; font: 500 20px 'DM Mono', monospace; text-shadow: 0 0 12px rgba(var(--drv-rgb), .8); }
+.hud-segs { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; height: 10px; }
+.hud-segs-lg { height: 14px; margin-top: 6px; }
+.hud-segs i { display: block; border-radius: 2px; background: rgba(255,255,255,.09); transition: background .35s, box-shadow .35s; }
+.hud-segs i.on { background: var(--drv); box-shadow: 0 0 8px rgba(var(--drv-rgb), .8); }
+.hud-rows { display: grid; gap: 9px; }
+.hud-row { display: grid; grid-template-columns: 82px minmax(0, 1fr) 44px; gap: 12px; align-items: center; }
+.hud-row span { color: var(--drv); font: 600 12px 'DM Mono', monospace; letter-spacing: .14em; }
+.hud-row small { display: block; margin-top: 1px; color: rgba(255,255,255,.42); font-size: 8px; letter-spacing: .16em; text-transform: uppercase; font-weight: 400; }
+.hud-row b { color: #fff; font: 500 14px 'DM Mono', monospace; text-align: right; }
+@media (max-width: 700px) {
+    .drv-hud { grid-template-columns: 1fr; gap: 12px; }
+    .hud-radar { max-width: 250px; margin: 0 auto; }
+    .hud-verdict b { font-size: 28px; }
+    .hud-row { grid-template-columns: 70px minmax(0, 1fr) 40px; gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .hud-sweep, .hud-dots circle { animation: none; } }

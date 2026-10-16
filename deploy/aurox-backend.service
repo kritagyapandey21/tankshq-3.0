@@ -1,5 +1,5 @@
 [Unit]
-Description=AUROX AI FastAPI backend
+Description=TANIX AI FastAPI backend
 After=network.target
 
 [Service]
@@ -9,7 +9,10 @@ Group=www-data
 WorkingDirectory=/var/www/aurox/backend
 EnvironmentFile=/var/www/aurox/backend/.env
 Environment=TRADER_DB_PATH=/var/lib/aurox/trader_preferences.sqlite3
-ExecStart=/var/www/aurox/backend/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8001
+# Chromium for Playwright is installed system-wide here (see HOSTINGER_VPS.md), because www-data has no home directory.
+Environment=PLAYWRIGHT_BROWSERS_PATH=/opt/ms-playwright
+# One worker only: Telegram verification and the one-session-per-trader lock live in this process.
+ExecStart=/var/www/aurox/backend/venv/bin/uvicorn app:app --host 127.0.0.1 --port 8001 --workers 1
 Restart=always
 RestartSec=5
 

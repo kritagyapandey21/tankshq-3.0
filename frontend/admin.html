@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin — Best Performers</title>
+    <link rel="icon" type="image/webp" href="assets/tanishq-logo.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="site.css?v=10">
+    <link rel="stylesheet" href="winners.css?v=2">
+    <link rel="stylesheet" href="admin.css?v=1">
+</head>
+<body>
+
+    <header class="site-nav">
+        <div class="container">
+            <a class="brand brand-logo" href="index.html" aria-label="Learn With Tanishq">
+                <img src="assets/tanishq-logo.webp" alt="" width="48" height="48">
+                <span class="brand-copy">
+                    <div class="brand-name">LEARN WITH <span>TANISHQ</span></div>
+                    <div class="brand-tagline">Admin</div>
+                </span>
+            </a>
+            <div class="nav-actions"><button class="btn btn-ghost" id="lockBtn" type="button" hidden>Lock</button></div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- sign in -->
+        <section class="glass ad-card ad-login" id="loginCard">
+            <p class="eyebrow">Admin access</p>
+            <h1>Best performers</h1>
+            <p class="ad-lede">Enter the admin key to update the winners shown on the website.</p>
+            <form id="loginForm" autocomplete="off">
+                <label for="adminKey">Admin key</label>
+                <input id="adminKey" type="password" autocomplete="off" spellcheck="false" required>
+                <button class="btn btn-gold" type="submit">Unlock</button>
+            </form>
+            <p class="ad-error" id="loginError" role="alert" hidden></p>
+        </section>
+
+        <!-- editor -->
+        <div id="editor" hidden>
+            <div class="welcome" style="padding-top:40px">
+                <p class="eyebrow">Admin</p>
+                <h1>Update <span class="gold-text">best performers</span></h1>
+                <p class="lede">Changes go live on the landing page and member hub as soon as you save. Winners are ranked by ROI automatically.</p>
+                <p class="ad-meta" id="updatedAt"></p>
+            </div>
+
+            <section class="glass ad-card">
+                <div class="ad-field ad-period">
+                    <label for="month">Period label</label>
+                    <input id="month" list="monthOptions" maxlength="30" placeholder="Last Month">
+                    <datalist id="monthOptions"><option value="Last Month"><option value="This Month"><option value="Last Week"><option value="This Week"><option value="All Time"></datalist>
+                    <small>Shown as "<span id="monthPreview">Last Month</span>'s Top Winners".</small>
+                </div>
+
+                <div class="ad-rows" id="rows"></div>
+                <p class="ad-note">Add 1 to 3 performers. Photos can be JPG, PNG or WebP, up to 2 MB. Use a square photo of the winner (with their permission).</p>
+
+                <div class="ad-actions">
+                    <button class="btn btn-gold" id="saveBtn" type="button">Save changes</button>
+                    <span class="ad-status" id="saveStatus" role="status"></span>
+                </div>
+            </section>
+
+            <section class="ad-preview">
+                <p class="eyebrow">Live preview</p>
+                <div class="win-cards" id="preview"></div>
+            </section>
+        </div>
+    </main>
+
+    <script>window.API_BASE_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:8000' : '/api';</script>
+    <script src="config.js?v=7"></script>
+    <script src="performers.js?v=1"></script>
+    <script src="admin.js?v=1"></script>
+</body>
+</html>

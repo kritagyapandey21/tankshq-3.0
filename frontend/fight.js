@@ -300,10 +300,21 @@
         ctx.restore();
 
         window.__fightMs = (window.__fightMs || 0) * 0.9 + (performance.now() - t0) * 0.1;
-        requestAnimationFrame(frame);
+        schedule();
     }
+
+    // Pause the animation when the hero is scrolled out of view or the tab is hidden.
+    let visible = true, rafId = 0;
+    function schedule() {
+        if (rafId || !visible || document.hidden) return;
+        rafId = requestAnimationFrame(t => { rafId = 0; frame(t); });
+    }
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(entries => { visible = entries[0].isIntersecting; schedule(); }, { rootMargin: '80px' }).observe(canvas);
+    }
+    document.addEventListener('visibilitychange', schedule);
 
     resize();
     window.addEventListener('resize', resize);
-    requestAnimationFrame(frame);
+    schedule();
 })();

@@ -1,0 +1,21 @@
+/* "Turn on daily reminders" popup (member hub, shown after login) */
+.notif-overlay { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 20px; background: rgba(4, 7, 6, .72); animation: notif-fade .25s ease; }
+.notif-overlay[hidden] { display: none; }
+.notif-card { width: min(440px, 100%); padding: 32px 30px 26px; text-align: center; border-color: var(--gold-line); background: linear-gradient(160deg, rgba(212,175,55,.16), rgba(18,20,19,.94) 55%); animation: notif-pop .3s cubic-bezier(.2,.9,.3,1.2); }
+.notif-icon { display: grid; width: 60px; height: 60px; margin: 0 auto 16px; place-items: center; color: var(--gold-light); border: 1px solid var(--gold-line); border-radius: 18px; background: var(--gold-wash); box-shadow: 0 0 30px rgba(212,175,55,.25); }
+.notif-icon svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; animation: notif-ring 2.4s ease-in-out infinite; transform-origin: 50% 20%; }
+.notif-card h2 { margin: 0; font-size: 23px; font-weight: 800; }
+.notif-sub { margin: 8px 0 0; color: var(--soft); font-size: 14.5px; line-height: 1.5; }
+.notif-quote { margin: 18px 0 0; padding: 14px 16px; color: var(--gold-light); font-size: 14.5px; font-weight: 600; line-height: 1.55; border-left: 3px solid var(--gold); border-radius: 4px 12px 12px 4px; background: rgba(0,0,0,.28); text-align: left; }
+.notif-help { margin: 14px 0 0; padding: 12px 14px; color: var(--soft); font-size: 13px; line-height: 1.6; text-align: left; border: 1px dashed var(--gold-line); border-radius: 12px; background: rgba(0,0,0,.25); }
+.notif-help b { color: var(--gold-light); }
+.notif-help[hidden] { display: none; }
+.notif-actions { display: grid; gap: 10px; margin-top: 22px; }
+.notif-actions .btn { min-height: 50px; font-size: 15px; }
+.notif-actions .btn[hidden] { display: none; }
+.notif-card.is-done .notif-actions, .notif-card.is-done .notif-quote { display: none; }
+@keyframes notif-fade { from { opacity: 0; } }
+@keyframes notif-pop { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+@keyframes notif-ring { 0%, 55%, 100% { transform: rotate(0); } 62% { transform: rotate(14deg); } 70% { transform: rotate(-12deg); } 78% { transform: rotate(8deg); } 86% { transform: rotate(-4deg); } }
+@media (max-width: 480px) { .notif-card { padding: 26px 20px 20px; } .notif-card h2 { font-size: 20px; } }
+@media (prefers-reduced-motion: reduce) { .notif-overlay, .notif-card, .notif-icon svg { animation: none; } }

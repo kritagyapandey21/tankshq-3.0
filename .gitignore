@@ -64,3 +64,9 @@ node_modules/
 # Node
 npm-debug.log
 yarn-error.log
+
+# Push notification signing key (secret)
+vapid_keys.json
+
+# Admin-uploaded winner photos (live data, not source code)
+uploads/

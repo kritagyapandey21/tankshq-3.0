@@ -21,9 +21,9 @@ try:
         _botv2.Logger.warn = _botv2.Logger.info
 except Exception:
     pass
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Request, Depends, Header
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Request, Depends, Header, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Literal
@@ -36,6 +36,8 @@ from config import (
     LOG_LEVEL, LOG_FORMAT, TRADING_PAIRS, BYPASS_TRADER_ID
 )
 import telegram_service
+import notifications
+import performers
 from market_data import MarketDataFetcher
 from analysis import SignalAnalyzer
 from pocket_option_api import PocketOptionSessionManager, PocketOptionDataFetcher
@@ -43,6 +45,7 @@ from pocket_option_config import POCKET_OPTION_ASSETS, POCKET_OPTION_CONFIDENCE_
 from timezone_utils import DEFAULT_TIMEZONE, is_valid_timezone, normalize_timezone, timezone_catalog
 from trader_store import (
     get_timezone, set_timezone, claim_session, touch_session, release_session,
+    trader_for_token, get_telegram_joined, set_telegram_joined, was_replaced,
 )
 
 # Configure logging
@@ -67,7 +70,7 @@ app.add_middleware(
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_headers=["Content-Type", "Authorization", "X-Admin-Key"],
 )
 
 
@@ -97,6 +100,11 @@ def active_session_token(authorization: Optional[str] = Header(None)) -> str:
     """Validate and refresh the caller's active Trader ID session."""
     scheme, _, token = (authorization or "").partition(" ")
     if scheme.lower() != "bearer" or not token or not touch_session(token):
+        if token and was_replaced(token):
+            raise HTTPException(
+                status_code=401,
+                detail="SESSION_REPLACED: This Trader ID signed in on another browser or device.",
+            )
         raise HTTPException(status_code=401, detail="Session expired. Please log in again.")
     return token
 
@@ -344,6 +352,9 @@ async def startup_event():
     else:
         logger.info("No PO token — using Gate.io (crypto) mode")
         update_binance_cache()
+
+    # Daily "time to trade" reminder for traders who enabled notifications.
+    asyncio.create_task(notifications.daily_loop())
 
 
 @app.post("/config/data-source")
@@ -780,11 +791,8 @@ async def verify_trader(request: Request, payload: Dict) -> Dict:
         saved_timezone = set_timezone(trader_id, timezone_name or get_timezone(trader_id))
         result["timezone"] = saved_timezone
         token = secrets.token_urlsafe(32)
-        if not claim_session(trader_id, token):
-            raise HTTPException(
-                status_code=409,
-                detail="This Trader ID is already logged in on another browser or device.",
-            )
+        # Newest login wins: an older session for this Trader ID (another browser/device) is signed out.
+        result["replaced_previous_session"] = claim_session(trader_id, token)
         result["session_token"] = token
     return result
 
@@ -798,6 +806,141 @@ async def session_heartbeat(_: str = Depends(active_session_token)) -> Dict:
 async def session_logout(token: str = Depends(active_session_token)) -> Dict:
     release_session(token)
     return {"logged_out": True}
+
+
+@app.get("/trader/flags")
+async def trader_flags(token: str = Depends(active_session_token)) -> Dict:
+    """Per-trader UI flags (currently: has this trader already opened the Telegram channel)."""
+    trader_id = trader_for_token(token)
+    return {"telegram_joined": bool(trader_id and get_telegram_joined(trader_id))}
+
+
+@app.post("/trader/telegram-joined")
+async def trader_telegram_joined(token: str = Depends(active_session_token)) -> Dict:
+    """Remember that this trader opened the Telegram channel so the hub stops showing the card."""
+    trader_id = trader_for_token(token)
+    if not trader_id:
+        raise HTTPException(status_code=401, detail="Session expired. Please log in again.")
+    set_telegram_joined(trader_id)
+    return {"telegram_joined": True}
+
+
+class PushKeys(BaseModel):
+    p256dh: str
+    auth: str
+
+
+class PushSubscription(BaseModel):
+    endpoint: str
+    keys: PushKeys
+
+
+class PushEndpoint(BaseModel):
+    endpoint: str
+
+
+@app.get("/push/public-key")
+async def push_public_key() -> Dict:
+    """Public VAPID key the browser needs to create a push subscription."""
+    return {"publicKey": notifications.public_key()}
+
+
+@app.post("/push/subscribe")
+async def push_subscribe(sub: PushSubscription, token: str = Depends(active_session_token)) -> Dict:
+    """Opt this trader's browser in to the daily trading reminder."""
+    trader_id = trader_for_token(token)
+    if not trader_id:
+        raise HTTPException(status_code=401, detail="Session expired. Please log in again.")
+    if not sub.endpoint.startswith("https://"):
+        raise HTTPException(status_code=400, detail="Invalid push endpoint.")
+    notifications.save_subscription(trader_id, sub.endpoint, sub.keys.p256dh, sub.keys.auth)
+    return {"subscribed": True}
+
+
+@app.post("/push/unsubscribe")
+async def push_unsubscribe(body: PushEndpoint, _: str = Depends(active_session_token)) -> Dict:
+    notifications.remove_subscription(body.endpoint)
+    return {"subscribed": False}
+
+
+@app.get("/notifications/today")
+async def notification_today(_: str = Depends(active_session_token)) -> Dict:
+    """Today's motivating message (same text as the push), for the in-app banner."""
+    return notifications.todays_message()
+
+
+@app.post("/push/test")
+async def push_test(x_admin_key: Optional[str] = Header(None)) -> Dict:
+    """Send today's notification to every subscriber right now. Requires ADMIN_KEY to be set."""
+    if not ADMIN_KEY or x_admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    return await notifications.send_to_all()
+
+
+# ── Best performers (editable from the admin page) ───────────────────
+
+def require_admin(x_admin_key: Optional[str]) -> None:
+    """Admin pages need ADMIN_KEY to be set; unlike the legacy admin endpoints they are never open."""
+    if not ADMIN_KEY or not secrets.compare_digest((x_admin_key or "").encode(), ADMIN_KEY.encode()):
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+
+class PerformerIn(BaseModel):
+    handle: str
+    roi: float
+    photo: str = ""
+
+
+class PerformersIn(BaseModel):
+    month: str = "Last Month"
+    performers: List[PerformerIn]
+
+
+@app.get("/performers")
+async def public_performers() -> JSONResponse:
+    """Public: the winners podium. `configured` is false until an admin saves one (the site then uses its built-in list)."""
+    data = performers.get()
+    body = {"configured": bool(data), **(data or {})}
+    return JSONResponse(body, headers={"Cache-Control": "public, max-age=60"})
+
+
+@app.get("/admin/performers")
+@limiter.limit("30/minute")
+async def admin_get_performers(request: Request, x_admin_key: Optional[str] = Header(None)) -> Dict:
+    require_admin(x_admin_key)
+    data = performers.get()
+    return {"configured": bool(data), **(data or {})}
+
+
+@app.post("/admin/performers")
+@limiter.limit("30/minute")
+async def admin_save_performers(request: Request, body: PerformersIn, x_admin_key: Optional[str] = Header(None)) -> Dict:
+    require_admin(x_admin_key)
+    try:
+        data = performers.save(body.month, [p.model_dump() for p in body.performers])
+    except (ValueError, KeyError) as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    logger.info("Best performers updated by admin (%d entries)", len(data["performers"]))
+    return {"configured": True, **data}
+
+
+@app.post("/admin/performers/photo")
+@limiter.limit("30/minute")
+async def admin_upload_photo(request: Request, file: UploadFile = File(...), x_admin_key: Optional[str] = Header(None)) -> Dict:
+    require_admin(x_admin_key)
+    data = await file.read(performers.MAX_UPLOAD_BYTES + 1)
+    try:
+        return {"photo": performers.save_upload(data)}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@app.get("/uploads/{name}")
+async def get_upload(name: str) -> FileResponse:
+    path = performers.upload_path(name)
+    if not path:
+        raise HTTPException(status_code=404, detail="Not found")
+    return FileResponse(path, headers={"Cache-Control": "public, max-age=31536000, immutable"})
 
 
 @app.get("/timezones")

@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Member Hub — TANIX AI 3.0</title>
     <link rel="icon" type="image/webp" href="assets/tanishq-logo.webp">
-    <link rel="stylesheet" href="site.css?v=7">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="site.css?v=10">
     <link rel="stylesheet" href="traderid.css?v=1">
+    <link rel="stylesheet" href="notify.css?v=4">
     <link rel="stylesheet" href="winners.css?v=2">
     <link rel="stylesheet" href="extras.css?v=7">
+    <link rel="stylesheet" href="perf.css?v=1">
 </head>
 <body class="gated" data-page="hub">
     <canvas id="bgCanvas"></canvas>
@@ -46,8 +51,8 @@
                         <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 4L3 11l6 2.5L11.5 20l3-4.5L19 18z"/></svg></div>
                         <span class="tag">Community</span>
                         <h3>Join Telegram</h3>
-                        <p>Our private channel for market notes, announcements and updates. Opens in Telegram in a new tab.</p>
-                        <ul><li>Daily market commentary</li><li>Platform announcements</li><li>Trader discussion</li></ul>
+                        <p>Our private channel for high-accuracy trade signals with clear entry and expiry times, plus market updates. Opens in Telegram in a new tab.</p>
+                        <ul><li>Accurate live trade signals</li><li>Entry &amp; expiry times</li><li>Market updates &amp; announcements</li></ul>
                         <span class="go">Join the channel <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
                     </a>
                     <a class="glass card access-card featured" href="tanix.html">
@@ -58,13 +63,13 @@
                         <ul><li>Live Pocket Option 1M chart</li><li>RSI · EMA · MACD confidence</li><li>Entry &amp; expiry countdown</li></ul>
                         <span class="go">Open terminal <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
                     </a>
-                    <a class="glass card access-card" href="guide.html">
+                    <a class="glass card access-card" href="money.html">
                         <div class="icon-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16.5 7.5C16.5 6 14.5 5 12 5s-4.5 1-4.5 2.8c0 4.4 9 2.2 9 6.6C16.5 16 14.5 17 12 17s-4.5-1-4.5-2.5"/></svg></div>
-                        <span class="tag">Education</span>
-                        <h3>Money Management Guide</h3>
-                        <p>The rules that keep you in the game: how much to risk, when to stop and how to size every trade.</p>
-                        <ul><li>Risk-per-trade rules</li><li>Daily loss &amp; profit limits</li><li>Built-in position calculator</li></ul>
-                        <span class="go">Read the guide <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
+                        <span class="tag">Tool</span>
+                        <h3>Money Management Tool</h3>
+                        <p>Know your next stake before every trade. Log each win or loss and the tracker works out the recommended stake step by step.</p>
+                        <ul><li>Step-by-step stake recommendations</li><li>Live balance &amp; profit / loss</li><li>Trade log with undo</li></ul>
+                        <span class="go">Open the tool <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span>
                     </a>
                 </div>
             </div>
@@ -100,52 +105,66 @@
         </section>
     </main>
 
+
+    <div class="notif-overlay" id="notifPopup" hidden>
+        <div class="glass notif-card" role="dialog" aria-modal="true" aria-labelledby="notifTitle">
+            <div class="notif-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
+            <h2 id="notifTitle">Turn on daily trading reminders</h2>
+            <p class="notif-sub">Get one notification a day, so you never miss your trading session.</p>
+            <blockquote class="notif-quote" id="notifMessage"></blockquote>
+            <p class="notif-help" id="notifHelp" hidden></p>
+            <div class="notif-actions">
+                <button class="btn btn-gold" id="notifOn" type="button">Turn on notifications</button>
+                <button class="btn btn-ghost" id="notifLater" type="button">Not now</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="site-footer" data-site-footer></footer>
 
     <script>window.API_BASE_URL = '/api';</script>
     <script src="config.js?v=7"></script>
-    <script src="app.js?v=4.3"></script>
-    <script src="extras.js?v=3"></script>
+    <script src="app.js?v=5.2"></script>
+    <script src="extras.js?v=4"></script>
     <script src="traderid.js?v=1"></script>
     <script src="footer.js?v=1"></script>
+    <script src="performers.js?v=1"></script>
+    <script src="notify.js?v=3"></script>
     <script>
         (function () {
             const cfg = window.TANIX_CONFIG || {};
-            document.getElementById('telegramCard').href = cfg.telegramUrl || '#';
+            const telegramCard = document.getElementById('telegramCard');
+            telegramCard.href = cfg.telegramUrl || '#';
 
-            const ranked = [...(cfg.performers || [])].sort((a, b) => b.roi - a.roi).slice(0, 3);
-            const byPlace = { 1: ranked[0], 2: ranked[1], 3: ranked[2] };
-            const podium = document.getElementById('podium');
-            // Same podium cards as the landing page: 2nd, 1st, 3rd.
-            const places = ['1st', '2nd', '3rd'];
-            [1, 0, 2].forEach(i => {
-                const w = ranked[i];
-                if (!w) return;
-                const c = document.createElement('div');
-                c.className = 'glass win-card p' + (i + 1);
-                const parts = [];
-                if (i === 0) parts.push(['span', 'crown', '♛']);
-                parts.push(['div', 'medal', '']);
-                parts.push(['div', 'place', places[i] + ' place']);
-                parts.push(['div', 'nm', w.handle]);
-                parts.push(['div', 'rr', '+' + Number(w.roi).toFixed(1) + '%']);
-                parts.forEach(([tag, cls, text]) => { const e = document.createElement(tag); e.className = cls; e.textContent = text; c.appendChild(e); });
-                const medal = c.querySelector('.medal');
-                medal.textContent = w.handle.replace('@', '').charAt(0).toUpperCase();
-                if (w.photo) {
-                    const img = new Image();
-                    img.alt = w.handle;
-                    img.onload = () => { medal.textContent = ''; medal.classList.add('has-photo'); medal.appendChild(img); };
-                    img.src = w.photo;
-                }
-                const small = document.createElement('small');
-                small.textContent = 'ROI';
-                c.querySelector('.rr').appendChild(small);
-                podium.appendChild(c);
-            });
-            if (cfg.performersMonth) {
-                document.getElementById('performersSub').textContent = cfg.performersMonth + "'s top community traders using TANIX AI 3.0.";
+            // Once a trader has opened the Telegram channel, the card is not shown to them again.
+            // The flag is saved on the server (follows the trader across devices); localStorage is a fast fallback.
+            const tgKey = 'tanix_tg_joined_' + (sessionStorage.getItem('aurox_trader_id') || '').toUpperCase();
+            const accessGrid = telegramCard.parentElement;
+            function hideTelegramCard() {
+                telegramCard.remove();
+                const left = accessGrid.children.length;
+                if (left === 2) accessGrid.classList.add('grid-2');
             }
+            let tgSeen = false;
+            try { tgSeen = localStorage.getItem(tgKey) === '1'; } catch (e) { /* storage unavailable */ }
+            if (tgSeen) hideTelegramCard();
+            else {
+                authenticatedFetch(`${API_BASE_URL}/trader/flags`)
+                    .then(r => r.ok ? r.json() : null)
+                    .then(f => { if (f && f.telegram_joined && telegramCard.isConnected) { try { localStorage.setItem(tgKey, '1'); } catch (e) {} hideTelegramCard(); } })
+                    .catch(() => { /* offline: keep the card */ });
+            }
+            telegramCard.addEventListener('click', () => {
+                try { localStorage.setItem(tgKey, '1'); } catch (e) { /* ignore */ }
+                authenticatedFetch(`${API_BASE_URL}/trader/telegram-joined`, { method: 'POST', keepalive: true }).catch(() => {});
+                setTimeout(hideTelegramCard, 400);   // let the new tab open first
+            });
+
+            // Best performers: list set on the admin page (falls back to config.js)
+            TanixPerformers.load().then(data => {
+                TanixPerformers.render(document.getElementById('podium'), data.performers);
+                document.getElementById('performersSub').textContent = data.month + "'s top community traders using TANIX AI 3.0.";
+            });
 
             document.addEventListener('aurox:ready', () => document.body.classList.remove('gated'));
         })();

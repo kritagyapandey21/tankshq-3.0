@@ -1,0 +1,65 @@
+/* Stake tracker — built on the shared site theme (site.css). */
+.mt-panel { margin-top: 24px; padding: 28px 30px; }
+.mt-h { margin: 0 0 16px; font-size: 20px; font-weight: 800; }
+.mt-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: end; }
+.mt-field label { display: block; color: #c9c9cc; font-size: 12px; font-weight: 700; }
+.mt-field input { width: 100%; min-height: 52px; margin-top: 6px; padding: 0 14px; color: var(--white); font: 16px var(--mono); border: 1px solid rgba(212,175,55,.3); border-radius: 12px; background: rgba(0,0,0,.35); }
+.mt-field input:focus { outline: 0; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,.12); }
+.mt-error { margin: 12px 0 0; color: var(--ruby); font: 13px var(--mono); }
+
+.mt-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 24px; }
+.mt-stat { padding: 18px 20px; }
+.mt-stat span { display: block; color: var(--muted); font: 500 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+.mt-stat b { display: block; margin-top: 8px; color: var(--gold-light); font: 500 24px var(--mono); }
+.mt-stat b.pos { color: var(--green); }
+.mt-stat b.neg { color: var(--ruby); }
+.mt-bar { height: 6px; margin-top: 14px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.08); }
+.mt-bar i { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--gold-deep), var(--gold-light)); transition: width .35s ease; }
+
+.mt-next-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.mt-next-head .eyebrow { margin-bottom: 8px; }
+.mt-reco-label { color: var(--soft); font-size: 13px; font-weight: 700; }
+.mt-reco { margin-top: 4px; color: var(--gold-light); font: 500 42px var(--mono); line-height: 1.1; }
+.mt-reco-note { max-width: 340px; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.mt-warn { margin-top: 16px; padding: 12px 14px; color: #ffb4bd; font-size: 13.5px; line-height: 1.5; border: 1px solid rgba(224,91,107,.4); border-radius: 12px; background: rgba(224,91,107,.1); }
+.mt-entry { display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: end; margin-top: 20px; }
+.mt-seg { display: inline-flex; padding: 4px; gap: 4px; border: 1px solid var(--gold-line); border-radius: 14px; background: rgba(0,0,0,.3); }
+.mt-seg button { min-height: 44px; padding: 0 22px; font-weight: 800; font-size: 14px; border: 0; border-radius: 10px; background: transparent; color: var(--soft); transition: background .2s, color .2s; }
+.mt-seg .seg-win[aria-pressed="true"] { color: #05150c; background: var(--green); }
+.mt-seg .seg-loss[aria-pressed="true"] { color: #fff; background: var(--ruby); }
+.mt-entry .btn { min-height: 52px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.mt-log-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.mt-log-head .mt-h { margin: 0; }
+.mt-actions { display: flex; gap: 10px; }
+.mt-actions .btn { min-height: 42px; padding: 0 18px; font-size: 13px; }
+.mt-table-wrap { margin-top: 12px; overflow-x: auto; }
+.mt-table td { font-family: var(--mono); }
+.mt-table td:first-child { color: var(--muted); font-weight: 500; }
+.mt-table tr.win td:nth-child(4) { color: var(--green); }
+.mt-table tr.loss td:nth-child(4) { color: var(--ruby); }
+.mt-empty { margin: 16px 0 0; color: var(--muted); font-size: 14px; }
+.mt-disclaimer { margin: 24px 0 0; font-size: 13px; }
+
+@media (max-width: 760px) {
+    .mt-panel { padding: 22px 18px; }
+    .mt-form { grid-template-columns: 1fr 1fr; } .mt-form .btn { grid-column: 1 / -1; }
+    .mt-stats { grid-template-columns: 1fr 1fr; }
+    .mt-stat b { font-size: 20px; }
+    .mt-reco { font-size: 34px; }
+    .mt-entry { grid-template-columns: 1fr; } .mt-seg { display: grid; grid-template-columns: 1fr 1fr; }
+    .mt-table th, .mt-table td { padding: 9px 6px; font-size: 13px; }
+}
+
+@media (max-width: 640px) {
+    .site-nav .brand-name { font-size: 16px; letter-spacing: .05em; white-space: nowrap; }
+    .site-nav .brand-logo img { width: 38px; height: 38px; }
+    .site-nav .nav-actions .btn { display: none; }
+}
+
+/* keep the footer at the bottom of the screen when the page is short */
+body[data-page="money"] { display: flex; flex-direction: column; }
+body[data-page="money"] > main { flex: 1 0 auto; width: min(1120px, calc(100% - 40px)); }
+body[data-page="money"] > .site-footer { flex: none; }
+@media (max-width: 640px) { body[data-page="money"] > main { width: calc(100% - 32px); } }

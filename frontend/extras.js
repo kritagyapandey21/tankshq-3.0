@@ -17,18 +17,19 @@
     function sizeRain() {
         rain.width = window.innerWidth;
         rain.height = window.innerHeight;
-        const count = window.innerWidth < 700 ? 22 : 48;
+        const count = window.innerWidth < 700 ? 14 : 30;
         drops = Array.from({ length: count }, () => ({
             x: Math.random() * rain.width, y: Math.random() * rain.height,
             size: Math.random() * 16 + 14, v: Math.random() * 1.2 + 0.6,
             sway: Math.random() * Math.PI * 2, s: symbols[Math.floor(Math.random() * symbols.length)],
             a: Math.random() * 0.3 + 0.12,
-        }));
+        })).map(d => (d.font = '700 ' + d.size + 'px Manrope, sans-serif', d));
     }
     function rainFrame() {
+        if (document.hidden) { requestAnimationFrame(rainFrame); return; }
         rctx.clearRect(0, 0, rain.width, rain.height);
         drops.forEach(d => {
-            rctx.font = '700 ' + d.size + 'px Manrope, sans-serif';
+            rctx.font = d.font;
             rctx.fillStyle = 'rgba(212,175,55,' + d.a + ')';
             rctx.fillText(d.s, d.x + Math.sin(d.sway) * 10, d.y);
             if (!reduceMotion) { d.y += d.v; d.sway += 0.02; }

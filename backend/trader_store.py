@@ -35,6 +35,23 @@ def _connect() -> sqlite3.Connection:
         )
         """
     )
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS replaced_sessions (
+            token_hash TEXT PRIMARY KEY,
+            replaced_at REAL NOT NULL
+        )
+        """
+    )
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS trader_flags (
+            trader_id TEXT PRIMARY KEY,
+            telegram_joined INTEGER NOT NULL DEFAULT 0,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
     return connection
 
 
@@ -43,21 +60,37 @@ def _token_hash(token: str) -> str:
 
 
 def claim_session(trader_id: str, token: str) -> bool:
-    """Atomically claim the sole active session for a Trader ID."""
+    """Make `token` the sole active session for a Trader ID.
+
+    The newest login wins: any older session for the same Trader ID is ended, and remembered as
+    "replaced" so that browser can be told why it was signed out. Returns True if an older, still
+    active session was replaced.
+    """
     now = time.time()
     with _connect() as connection:
         connection.execute("BEGIN IMMEDIATE")
         connection.execute("DELETE FROM trader_sessions WHERE last_seen < ?", (now - SESSION_TTL_SECONDS,))
-        existing = connection.execute(
-            "SELECT 1 FROM trader_sessions WHERE trader_id = ?", (trader_id.casefold(),)
+        connection.execute("DELETE FROM replaced_sessions WHERE replaced_at < ?", (now - 86400,))
+        old = connection.execute(
+            "SELECT token_hash FROM trader_sessions WHERE trader_id = ?", (trader_id.casefold(),)
         ).fetchone()
-        if existing:
-            return False
+        if old:
+            connection.execute("INSERT OR REPLACE INTO replaced_sessions (token_hash, replaced_at) VALUES (?, ?)", (old[0], now))
+            connection.execute("DELETE FROM trader_sessions WHERE trader_id = ?", (trader_id.casefold(),))
         connection.execute(
             "INSERT INTO trader_sessions (trader_id, token_hash, last_seen) VALUES (?, ?, ?)",
             (trader_id.casefold(), _token_hash(token), now),
         )
-        return True
+        return bool(old)
+
+
+def was_replaced(token: str) -> bool:
+    """True if this token's session was ended because the same Trader ID logged in elsewhere."""
+    with _connect() as connection:
+        row = connection.execute(
+            "SELECT 1 FROM replaced_sessions WHERE token_hash = ?", (_token_hash(token),)
+        ).fetchone()
+    return bool(row)
 
 
 def touch_session(token: str) -> bool:
@@ -98,3 +131,34 @@ def set_timezone(trader_id: str, timezone_name: str) -> str:
             (trader_id, timezone_name),
         )
     return timezone_name
+
+
+def trader_for_token(token: str) -> str | None:
+    """Trader ID that owns an active session token (lower-cased), or None."""
+    with _connect() as connection:
+        row = connection.execute(
+            "SELECT trader_id FROM trader_sessions WHERE token_hash = ?", (_token_hash(token),)
+        ).fetchone()
+    return row[0] if row else None
+
+
+def get_telegram_joined(trader_id: str) -> bool:
+    with _connect() as connection:
+        row = connection.execute(
+            "SELECT telegram_joined FROM trader_flags WHERE trader_id = ?", (trader_id.casefold(),)
+        ).fetchone()
+    return bool(row and row[0])
+
+
+def set_telegram_joined(trader_id: str) -> None:
+    with _connect() as connection:
+        connection.execute(
+            """
+            INSERT INTO trader_flags (trader_id, telegram_joined, updated_at)
+            VALUES (?, 1, CURRENT_TIMESTAMP)
+            ON CONFLICT(trader_id) DO UPDATE SET
+                telegram_joined = 1,
+                updated_at = CURRENT_TIMESTAMP
+            """,
+            (trader_id.casefold(),),
+        )

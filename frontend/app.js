@@ -56,7 +56,7 @@ const btnLoader       = $('btnLoader');
     let W, H, particles;
 
     const isMobile = window.matchMedia('(max-width: 650px)').matches;
-    const PARTICLE_COUNT = isMobile ? 24 : 70;
+    const PARTICLE_COUNT = isMobile ? 14 : 40;
     const MAX_DIST = 140;
     const SPEED    = 0.25;
     let frame = 0;
@@ -83,7 +83,7 @@ const btnLoader       = $('btnLoader');
 
     function draw() {
         frame += 1;
-        if (document.hidden || (isMobile && frame % 2)) {
+        if (document.hidden || frame % 2) {   // ~30fps is plenty for a slow drift
             requestAnimationFrame(draw);
             return;
         }
@@ -242,9 +242,9 @@ function displaySignal(signal) {
     $('marketSignalEntry').textContent = formatInTimezone(signal.entry_timestamp);
     $('marketSignalExpiry').textContent = formatInTimezone(signal.expiry_timestamp);
     $('driverSignal').textContent = `${signal.direction} · ${signal.pair}`;
-    setIndicator('driverRsiScore', 'driverRsiPercent', signal.indicator_scores.rsi);
-    setIndicator('driverEmaScore', 'driverEmaPercent', signal.indicator_scores.ema);
-    setIndicator('driverMacdScore', 'driverMacdPercent', signal.indicator_scores.macd);
+    const driversPanel = document.querySelector('.drivers-panel');
+    if (driversPanel) { driversPanel.classList.remove('is-buy', 'is-sell'); driversPanel.classList.add(signal.direction === 'BUY' ? 'is-buy' : 'is-sell'); }
+    updateDriverHud(signal.indicator_scores, signal.direction, signal.confidence);
     $('demoMarketView').style.display = 'none';
     $('marketSignalView').style.display = 'block';
     $('signalPair').textContent       = signal.pair;
@@ -337,8 +337,8 @@ function renderNeuralPairs(nodes) {
         const pair = document.createElement('span');
         pair.className = 'neural-live-pair';
         pair.dataset.pair = String(node.id).replace(/[_/-]/g, '').toUpperCase();
-        pair.style.left = `${50 + Math.cos(angle) * 40}%`;
-        pair.style.top = `${50 + Math.sin(angle) * 40}%`;
+        pair.style.left = `${50 + Math.cos(angle) * 50}%`;
+        pair.style.top = `${50 + Math.sin(angle) * 50}%`;
         pair.textContent = String(node.label || node.id)
             .replace('_otc', '')
             .replace(/([A-Z]{3})([A-Z]{3})/, '$1/$2');
@@ -353,40 +353,70 @@ function drawSignalChart(candles, canvasId = 'signalChart') {
     const bounds = canvas.getBoundingClientRect();
     if (bounds.width < 2 || bounds.height < 2) return;
     const ratio = window.devicePixelRatio || 1;
-    const width = Math.max(1, Math.floor(bounds.width * ratio));
-    const height = Math.max(1, Math.floor(bounds.height * ratio));
-    canvas.width = width;
-    canvas.height = height;
-    const context = canvas.getContext('2d');
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    const prices = candles.map(candle => Number(candle.close));
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    const range = max - min || max * 0.001 || 1;
-    const padding = 16;
-    const xStep = (bounds.width - padding * 2) / Math.max(1, prices.length - 1);
-    const y = price => bounds.height - padding - ((price - min) / range) * (bounds.height - padding * 2);
-    context.clearRect(0, 0, bounds.width, bounds.height);
-    context.strokeStyle = 'rgba(112, 194, 207, .14)';
-    context.lineWidth = 1;
-    for (let index = 1; index < 4; index += 1) {
-        const lineY = padding + ((bounds.height - padding * 2) / 4) * index;
-        context.beginPath(); context.moveTo(0, lineY); context.lineTo(bounds.width, lineY); context.stroke();
-    }
-    context.beginPath();
-    prices.forEach((price, index) => {
-        const x = padding + xStep * index;
-        if (index === 0) context.moveTo(x, y(price)); else context.lineTo(x, y(price));
+    canvas.width = Math.max(1, Math.floor(bounds.width * ratio));
+    canvas.height = Math.max(1, Math.floor(bounds.height * ratio));
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+    // Normalise to OHLC. Data without open/high/low (older feeds) falls back to close-to-close candles.
+    let prevClose = null;
+    const bars = candles.map(c => {
+        const close = Number(c.close);
+        const open = Number.isFinite(Number(c.open)) && c.open !== undefined ? Number(c.open) : (prevClose ?? close);
+        const high = Number.isFinite(Number(c.high)) && c.high !== undefined ? Number(c.high) : Math.max(open, close);
+        const low = Number.isFinite(Number(c.low)) && c.low !== undefined ? Number(c.low) : Math.min(open, close);
+        prevClose = close;
+        return { open, high: Math.max(high, open, close), low: Math.min(low, open, close), close };
     });
-    context.strokeStyle = '#6be2ed';
-    context.lineWidth = 2;
-    context.shadowColor = '#6be2ed';
-    context.shadowBlur = 8;
-    context.stroke();
-    context.shadowBlur = 0;
-    const lastX = padding + xStep * (prices.length - 1);
-    context.fillStyle = '#ffffff';
-    context.beginPath(); context.arc(lastX, y(prices[prices.length - 1]), 3, 0, Math.PI * 2); context.fill();
+
+    const W = bounds.width, H = bounds.height;
+    const padTop = 14, padBottom = 14, padLeft = 10, padRight = 62;        // right gutter holds the price scale
+    const plotW = W - padLeft - padRight, plotH = H - padTop - padBottom;
+    const hi = Math.max(...bars.map(b => b.high)), lo = Math.min(...bars.map(b => b.low));
+    const span = (hi - lo) || hi * 0.001 || 1;
+    const max = hi + span * 0.06, min = lo - span * 0.06, range = max - min;
+    const y = p => padTop + (1 - (p - min) / range) * plotH;
+    const slot = plotW / bars.length;
+    const bodyW = Math.max(2, Math.min(14, slot * 0.64));
+    const UP = '#39e58c', DOWN = '#e05b6b';
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '10px "DM Mono", ui-monospace, monospace';
+    ctx.textBaseline = 'middle';
+
+    // grid + price scale (a scale number is skipped when the live-price tag would cover it)
+    const liveY = y(bars[bars.length - 1].close);
+    for (let i = 0; i <= 4; i += 1) {
+        const price = max - (range / 4) * i, gy = y(price);
+        ctx.strokeStyle = 'rgba(255, 255, 255, .06)'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(padLeft, gy); ctx.lineTo(W - padRight + 6, gy); ctx.stroke();
+        if (Math.abs(gy - liveY) < 12) continue;
+        ctx.fillStyle = 'rgba(255, 255, 255, .42)'; ctx.textAlign = 'left';
+        ctx.fillText(formatPrice(price), W - padRight + 10, gy);
+    }
+
+    // candles
+    bars.forEach((b, i) => {
+        const cx = padLeft + slot * i + slot / 2;
+        const up = b.close >= b.open, color = up ? UP : DOWN;
+        const isLast = i === bars.length - 1;
+        ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1;
+        if (isLast) { ctx.shadowColor = color; ctx.shadowBlur = 10; }
+        ctx.beginPath(); ctx.moveTo(cx, y(b.high)); ctx.lineTo(cx, y(b.low)); ctx.stroke();            // wick
+        const top = y(Math.max(b.open, b.close)), h = Math.max(1.5, Math.abs(y(b.open) - y(b.close)));
+        ctx.globalAlpha = up ? 0.9 : 1;
+        ctx.fillRect(cx - bodyW / 2, top, bodyW, h);                                                    // body
+        ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    });
+
+    // live price line + tag
+    const last = bars[bars.length - 1], lastColor = last.close >= last.open ? UP : DOWN, ly = y(last.close);
+    ctx.setLineDash([4, 4]); ctx.strokeStyle = lastColor; ctx.globalAlpha = 0.7; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(padLeft, ly); ctx.lineTo(W - padRight + 6, ly); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha = 1;
+    const tag = formatPrice(last.close), tw = ctx.measureText(tag).width + 10;
+    ctx.fillStyle = lastColor; ctx.fillRect(W - padRight + 6, ly - 9, tw, 18);
+    ctx.fillStyle = '#06100b'; ctx.textAlign = 'left'; ctx.fillText(tag, W - padRight + 11, ly);
 }
 
 function addSignalToHistory(signal) {
@@ -433,9 +463,73 @@ function renderSignalHistory() {
     });
 }
 
+
+// ── Signal Drivers HUD: 3-axis radar + LED readouts ──────────────────
+const HUD_AXES = { rsi: [-90, 'Rsi'], ema: [30, 'Ema'], macd: [150, 'Macd'] };
+const HUD_CX = 130, HUD_CY = 125, HUD_R = 85, HUD_SEGS = 14, HUD_SEGS_LG = 28;
+const hudState = { rsi: 0, ema: 0, macd: 0, raf: null };
+
+function hudPoint(key, value) {
+    const r = 8 + (HUD_R - 8) * Math.min(100, Math.max(0, value)) / 100;
+    const a = HUD_AXES[key][0] * Math.PI / 180;
+    return [HUD_CX + Math.cos(a) * r, HUD_CY + Math.sin(a) * r];
+}
+function hudDraw(v) {
+    const poly = $('driverPoly');
+    if (!poly) return;
+    const pts = Object.keys(HUD_AXES).map(k => hudPoint(k, v[k]));
+    poly.setAttribute('points', pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '));
+    Object.keys(HUD_AXES).forEach((k, i) => {
+        const dot = $('dot' + HUD_AXES[k][1]);
+        dot.setAttribute('cx', pts[i][0].toFixed(1));
+        dot.setAttribute('cy', pts[i][1].toFixed(1));
+    });
+}
+function hudSegments(id, count, value) {
+    const box = $(id);
+    if (!box) return;
+    if (box.children.length !== count) {
+        box.textContent = '';
+        for (let i = 0; i < count; i++) box.appendChild(document.createElement('i'));
+    }
+    const lit = Math.round(Math.min(100, Math.max(0, value)) / 100 * count);
+    [...box.children].forEach((seg, i) => {
+        seg.classList.toggle('on', i < lit);
+        seg.style.transitionDelay = (i * 18) + 'ms';
+    });
+}
+function updateDriverHud(scores, direction, confidence) {
+    const target = { rsi: +scores.rsi || 0, ema: +scores.ema || 0, macd: +scores.macd || 0 };
+    // Use the backend's own confidence so this matches the signal toast; fall back to the average of the three scores.
+    const conf = Math.round(Number.isFinite(+confidence) && confidence !== null && confidence !== undefined ? +confidence : (target.rsi + target.ema + target.macd) / 3);
+    const verdict = $('hudVerdict');
+    verdict.textContent = direction || 'STANDBY';
+    verdict.className = direction ? direction.toLowerCase() : '';
+    $('hudConfluence').textContent = `${conf}%`;
+    hudSegments('hudSegConf', HUD_SEGS_LG, conf);
+    Object.keys(HUD_AXES).forEach(k => {
+        const name = HUD_AXES[k][1];
+        $('driver' + name + 'Percent').textContent = `${Math.round(target[k])}%`;
+        hudSegments('hudSeg' + name, HUD_SEGS, target[k]);
+    });
+    // morph the radar polygon from its current shape to the new one
+    const from = { rsi: hudState.rsi, ema: hudState.ema, macd: hudState.macd };
+    const t0 = performance.now(), DURATION = 900;
+    cancelAnimationFrame(hudState.raf);
+    (function step(now) {
+        const t = Math.min(1, (now - t0) / DURATION), e = 1 - Math.pow(1 - t, 3);
+        const cur = {};
+        Object.keys(target).forEach(k => { cur[k] = from[k] + (target[k] - from[k]) * e; hudState[k] = cur[k]; });
+        hudDraw(cur);
+        if (t < 1) hudState.raf = requestAnimationFrame(step);
+    })(t0);
+}
+
 function setIndicator(barId, pctId, value) {
     const pct = Math.min(100, Math.max(0, value));
-    $(barId).style.width       = `${pct}%`;
+    const bar = $(barId);
+    if (bar.hasAttribute('data-arc')) bar.style.strokeDashoffset = String(100 - pct);   // circular gauge
+    else bar.style.width = `${pct}%`;
     $(pctId).textContent       = `${Math.round(pct)}%`;
 }
 
@@ -877,8 +971,11 @@ async function initLogin() {
         window.open(event.currentTarget.href, '_blank', 'noopener,noreferrer');
     });
 
-    if (new URLSearchParams(location.search).has('expired')) {
-        loginError.textContent = '⚠ SESSION EXPIRED — PLEASE LOG IN AGAIN';
+    const expiredParam = new URLSearchParams(location.search).get('expired');
+    if (expiredParam !== null) {
+        loginError.textContent = expiredParam === 'replaced'
+            ? '⚠ YOU WERE SIGNED OUT — THIS TRADER ID SIGNED IN ON ANOTHER DEVICE'
+            : '⚠ SESSION EXPIRED — PLEASE LOG IN AGAIN';
         loginError.style.display = 'block';
     }
     const storedTraderId = sessionStorage.getItem('aurox_trader_id');
@@ -913,7 +1010,7 @@ function startSessionHeartbeat() {
     sessionHeartbeatInterval = setInterval(async () => {
         try {
             const response = await authenticatedFetch(`${API_BASE_URL}/session/heartbeat`, { method: 'POST' });
-            if (!response.ok) doLogout();
+            if (!response.ok) doLogout(true, await wasSessionReplaced(response));
         } catch {
             // Keep the current session during brief network interruptions; the
             // server expires it if heartbeats stop for SESSION_TTL_SECONDS.
@@ -944,9 +1041,14 @@ function clearSession() {
     sessionStorage.removeItem(SESSION_TOKEN_KEY);
 }
 
-function doLogout(expired = true) {
+// True when the server ended this session because the same Trader ID logged in somewhere else.
+async function wasSessionReplaced(response) {
+    try { return String((await response.clone().json()).detail || '').startsWith('SESSION_REPLACED'); } catch (e) { return false; }
+}
+
+function doLogout(expired = true, replaced = false) {
     const token = sessionStorage.getItem(SESSION_TOKEN_KEY);
-    const finish = () => { location.replace(expired ? 'login.html?expired=1' : 'login.html'); };
+    const finish = () => { location.replace(replaced ? 'login.html?expired=replaced' : expired ? 'login.html?expired=1' : 'login.html'); };
     clearInterval(sessionHeartbeatInterval);
     clearTimeout(inactivityTimer);
     clearSession();
@@ -970,7 +1072,12 @@ async function requireSession() {
     if (!traderId || !token) { location.replace('login.html'); return null; }
     try {
         const response = await authenticatedFetch(`${API_BASE_URL}/session/heartbeat`, { method: 'POST' });
-        if (!response.ok) throw new Error('expired');
+        if (!response.ok) {
+            const replaced = await wasSessionReplaced(response);
+            clearSession();
+            location.replace(replaced ? 'login.html?expired=replaced' : 'login.html?expired=1');
+            return null;
+        }
     } catch (error) {
         // Only an explicit rejection ends the session; a network blip keeps it.
         if (error.message === 'expired') { clearSession(); location.replace('login.html?expired=1'); return null; }
@@ -1009,5 +1116,5 @@ document.addEventListener('DOMContentLoaded', () => {
     const page = document.body.dataset.page;
     if (page === 'login') initLogin();
     else if (page === 'terminal') initTerminal();
-    else if (page === 'hub' || page === 'guide') requireSession().then(id => { if (id) document.dispatchEvent(new CustomEvent('aurox:ready')); });
+    else if (page === 'hub' || page === 'guide' || page === 'money') requireSession().then(id => { if (id) document.dispatchEvent(new CustomEvent('aurox:ready')); });
 });

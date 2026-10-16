@@ -6,10 +6,18 @@
     <title>TANIX AI 3.0 — Precise Algorithm To Trade Smarter</title>
     <meta name="description" content="TANIX AI 3.0 delivers AI-assisted trading signals, a private Telegram community and a money management guide for verified traders.">
     <link rel="icon" type="image/webp" href="assets/tanishq-logo.webp">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="site.css?v=2">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <link rel="preload" as="image" href="assets/bull-wireframe-cutout.webp" fetchpriority="low">
+    <link rel="preload" as="image" href="assets/bear-wireframe-cutout.webp" fetchpriority="low">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="site.css?v=10">
     <link rel="stylesheet" href="extras.css?v=7">
     <link rel="stylesheet" href="landing.css?v=17">
+    <link rel="stylesheet" href="perf.css?v=1">
 </head>
 <body class="landing">
     <canvas id="bgCanvas"></canvas>
@@ -83,7 +91,7 @@
                 <p>A complete suite of tools built for consistent trading.</p>
             </div>
             <div class="lp-grid c2">
-                <article class="glass lp-card"><div class="lp-icon"><i class="fa-solid fa-robot"></i></div><h3>TANIX AI 3.0</h3><p>TANIX AI 3.0 is powered by my proprietary reversal trading strategy, combined with high-probability Sureshot patterns and advanced technical indicators, including MACD, RSI, and EMA. Designed to identify potential market reversals and high-quality trading opportunities, Tanix AI 3.0 helps traders spot precise entry points with greater confidence.</p></article>
+                <article class="glass lp-card"><div class="lp-icon"><i class="fa-solid fa-robot"></i></div><h3>TANIX AI 3.0</h3><p>A signal algorithm that analyses live market data with my personal best strategies and high-probability Sureshot patterns to generate clear BUY / SELL triggers with entry and expiry times.</p></article>
                 <article class="glass lp-card"><div class="lp-icon"><i class="fa-solid fa-paper-plane"></i></div><h3>Private Telegram Channel</h3><p>Announcements, market commentary and community discussion delivered straight to your phone.</p></article>
                 <article class="glass lp-card"><div class="lp-icon"><i class="fa-solid fa-chart-line"></i></div><h3>Risk &amp; Compounding Rules</h3><p>Risk management protocols engineered to protect your capital while growing your account systematically.</p></article>
                 <article class="glass lp-card"><div class="lp-icon"><i class="fa-solid fa-book"></i></div><h3>Money Management Guide</h3><p>Session discipline, position sizing and the psychological rules for modern markets — with a built-in calculator.</p></article>
@@ -94,7 +102,7 @@
         <section id="winners">
             <div class="center-head">
                 <p class="eyebrow">Leaderboard</p>
-                <h2><i class="fa-solid fa-trophy gold-text"></i> Last Month's Top Winners</h2>
+                <h2><i class="fa-solid fa-trophy gold-text"></i> <span id="winMonth">Last Month</span>'s Top Winners</h2>
                 <p>Our highest ROI community traders using TANIX AI 3.0.</p>
             </div>
             <div class="win-cards" id="winCards"></div>
@@ -119,7 +127,7 @@
             <div class="glass about-main">
                 <h2>About Learn With Tanishq</h2>
                 <div class="coins">
-                    <div class="coin"><i class="fa-solid fa-user"></i><img src="assets/founder.jpg?v=2" alt="Tanishq, founder" onerror="this.hidden=true"></div>
+                    <div class="coin"><i class="fa-solid fa-user"></i><img src="assets/founder.jpg?v=2" alt="Tanishq, founder" loading="lazy" decoding="async" onerror="this.hidden=true"></div>
                     <div class="coin gold"><img src="assets/tanishq-logo.webp" alt="Learn with Tanishq logo"></div>
                 </div>
                 <h3>ABOUT TANISHQ</h3>
@@ -199,9 +207,10 @@
 
     <script>window.API_BASE_URL = '/api';</script>
     <script src="config.js?v=7"></script>
-    <script src="app.js?v=4.3"></script>
-    <script src="extras.js?v=3"></script>
-    <script src="landing.js?v=7"></script>
-    <script src="fight.js?v=2"></script>
+    <script src="app.js?v=5.2"></script>
+    <script src="extras.js?v=4"></script>
+    <script src="performers.js?v=1"></script>
+    <script src="landing.js?v=9"></script>
+    <script src="fight.js?v=3"></script>
 </body>
 </html>
