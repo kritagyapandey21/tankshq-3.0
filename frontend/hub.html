@@ -123,10 +123,10 @@
     <footer class="site-footer" data-site-footer></footer>
 
     <script>window.API_BASE_URL = '/api';</script>
-    <script src="config.js?v=7"></script>
-    <script src="app.js?v=5.3"></script>
+    <script src="config.js?v=9"></script>
+    <script src="app.js?v=5.4"></script>
     <script src="extras.js?v=4"></script>
-    <script src="traderid.js?v=1"></script>
+    <script src="traderid.js?v=2"></script>
     <script src="footer.js?v=2"></script>
     <script src="performers.js?v=1"></script>
     <script src="notify.js?v=3"></script>
@@ -134,7 +134,7 @@
         (function () {
             const cfg = window.TANIX_CONFIG || {};
             const telegramCard = document.getElementById('telegramCard');
-            telegramCard.href = cfg.telegramUrl || '#';
+            telegramCard.href = cfg.tanixTelegramUrl || cfg.telegramUrl || '#';
 
             // Once a trader has opened the Telegram channel, the card is hidden for them.
             // The server is the source of truth (an admin can reset a trader, which shows the card again);

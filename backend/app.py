@@ -1066,6 +1066,22 @@ async def relay_prices() -> Dict:
     return {"count": len(result), "prices": result}
 
 
+@app.get("/admin/market-snapshot")
+@limiter.limit("120/minute")
+async def admin_market_snapshot(request: Request, x_admin_key: Optional[str] = Header(None)) -> Dict:
+    """Read-only: the live Pocket Option candle cache ({pair: [[unix_ts, close], ...]}) for monitoring and scoring signals."""
+    require_admin(x_admin_key)
+    from po_websocket import OTC_SYMBOL_MAP
+    reverse_map = {v: k for k, v in OTC_SYMBOL_MAP.items()}
+    pairs = {reverse_map.get(sym, sym): [[int(c[0]), float(c[1])] for c in candles[-200:]]
+             for sym, candles in relay_candle_cache.items()}
+    return {
+        "data_source": current_config["data_source"],
+        "updated_at": relay_cache_timestamp.isoformat() if relay_cache_timestamp else None,
+        "pairs": pairs,
+    }
+
+
 @app.post("/update-cache")
 @limiter.limit("5/minute")
 async def manual_cache_update(

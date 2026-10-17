@@ -987,7 +987,7 @@ async function initLogin() {
             // Already signed in: keep the login form visible, offer a shortcut instead of redirecting.
             const banner = document.getElementById('resumeBanner');
             if (banner) {
-                banner.querySelector('b').textContent = storedTraderId.toUpperCase();
+                banner.querySelector('b').textContent = '\u2022'.repeat(storedTraderId.length);   // never show the ID on the login page
                 banner.hidden = false;
             }
             loginInput.focus();

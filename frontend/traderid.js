@@ -1,17 +1,16 @@
 /* Adds a mask / unmask (eye) toggle to every trader ID display: elements marked [data-tid].
-   Masks the last 5 characters. State is shared across pages for the browser session. */
+   Hides the whole ID with dots. It starts hidden; the eye button reveals it. State is shared across pages for the browser session. */
 (function () {
     var KEY = 'aurox_tid_masked';
     function getId() { try { return (sessionStorage.getItem('aurox_trader_id') || '').toUpperCase(); } catch (e) { return ''; } }
-    function isMasked() { try { return sessionStorage.getItem(KEY) === '1'; } catch (e) { return false; } }
+    function isMasked() { try { return sessionStorage.getItem(KEY) !== '0'; } catch (e) { return true; } }   // hidden unless the user chose to show it
     function setMasked(v) { try { sessionStorage.setItem(KEY, v ? '1' : '0'); } catch (e) {} }
     var EYE = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/><line class="slash" x1="3" y1="21" x2="21" y2="3"/></svg>';
     var views = [];
 
     function text(masked, id) {
         if (!id) return '--';
-        var n = Math.min(5, id.length);
-        return masked ? id.slice(0, id.length - n) + '\u2022'.repeat(n) : id;
+        return masked ? '\u2022'.repeat(id.length) : id;
     }
     function render(v) {
         var id = getId(), masked = isMasked(), t = text(masked, id);
@@ -31,7 +30,7 @@
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'tid-eye';
-        btn.title = 'Mask / unmask last 5 digits';
+        btn.title = 'Show / hide Trader ID';
         btn.innerHTML = EYE;
         row.appendChild(btn);
         var v = { el: el, btn: btn };

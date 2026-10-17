@@ -4,14 +4,29 @@ Analyzes indicators and generates trading signals.
 """
 
 import logging
+import os
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timedelta, timezone
 
 IST = timezone(timedelta(hours=5, minutes=30))
 from indicators import TechnicalIndicators
 from config import CONFIDENCE_WEIGHTS, MIN_CONFIDENCE_THRESHOLD
+import signal_v3
 
 logger = logging.getLogger(__name__)
+
+# Which signal engine the app uses (set SIGNAL_ENGINE in .env, restart the backend):
+#   v2            the original RSI + EMA + MACD vote (default)
+#   v3            Supertrend + EMA trend stack and RSI/Bollinger/StochRSI, blended by trend strength (Efficiency Ratio)
+#   v3-reversion  the v3 mean-reversion stack only (fade the most stretched pair); best in the 1-minute backtest
+#   v3-reversion-plus  v3-reversion that only trades when RSI, Bollinger and StochRSI all agree
+# See backend/backtest_signals.py and backend/live_check.py for how they were tested.
+SIGNAL_ENGINE = os.environ.get("SIGNAL_ENGINE", "v2").strip().lower()
+ENGINES = ("v2", "v3", "v3-reversion", "v3-reversion-plus")
+if SIGNAL_ENGINE not in ENGINES:
+    logger.warning("Unknown SIGNAL_ENGINE=%r, using v2", SIGNAL_ENGINE)
+    SIGNAL_ENGINE = "v2"
+logger.info("Signal engine: %s", SIGNAL_ENGINE)
 
 
 class SignalAnalyzer:
@@ -71,9 +86,51 @@ class SignalAnalyzer:
             return None
 
     @staticmethod
-    def analyze_pair(pair_data: Dict) -> Optional[Dict]:
+    def analyze_pair(pair_data: Dict, engine: Optional[str] = None) -> Optional[Dict]:
+        """Analyze one pair with the configured engine (or the one named in `engine`)."""
+        engine = engine or SIGNAL_ENGINE
+        if engine == "v3":
+            return SignalAnalyzer._analyze_pair_v3(pair_data, reversion_only=False)
+        if engine == "v3-reversion":
+            return SignalAnalyzer._analyze_pair_v3(pair_data, reversion_only=True)
+        if engine == "v3-reversion-plus":
+            return SignalAnalyzer._analyze_pair_v3(pair_data, reversion_only=True, plus=True)
+        return SignalAnalyzer._analyze_pair_v2(pair_data)
+
+    @staticmethod
+    def _analyze_pair_v3(pair_data: Dict, reversion_only: bool, plus: bool = False) -> Optional[Dict]:
+        """v3 engine (signal_v3.py). Indicator scores are 0-100 agreement with the call: above 50 supports it."""
+        closes, symbol = pair_data["closes"], pair_data["symbol"]
+        if plus:
+            r = signal_v3.analyze_reversion_plus(closes)
+        elif reversion_only:
+            r = signal_v3.analyze(closes, ker_range=5.0, ker_trend=6.0)
+        else:
+            r = signal_v3.analyze(closes)
+        if not r or not r["direction"]:
+            return None
+        d = 1 if r["direction"] == "CALL" else -1
+        comp = r["components"]
+        agree = lambda x: round(max(0.0, min(100.0, 50 + 50 * x * d)), 1)
+        oscillators = comp["rsi"] * 0.4 + comp["bollinger"] * 0.35 + comp["stoch_rsi"] * 0.25
+        return {
+            "symbol": symbol,
+            "confidence": r["confidence"],
+            "direction": r["direction"],
+            "price": pair_data["current_price"],
+            "signals": {
+                "rsi": agree(oscillators),           # RSI + Bollinger + StochRSI (mean reversion)
+                "ema": agree(comp["ema"]),
+                "macd": agree(comp["macd"]),
+                "supertrend": agree(comp["supertrend"]),
+                "strength": round(comp["ker"] * 100, 1),   # trend strength (Efficiency Ratio), not directional
+            },
+        }
+
+    @staticmethod
+    def _analyze_pair_v2(pair_data: Dict) -> Optional[Dict]:
         """
-        Analyze a single trading pair and generate signal data.
+        Analyze a single trading pair and generate signal data (original v2 engine).
 
         Args:
             pair_data: Dictionary containing closes and symbol
