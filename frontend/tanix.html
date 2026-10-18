@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=5.9">
+    <link rel="stylesheet" href="styles.css?v=6.0">
     <link rel="stylesheet" href="extras.css?v=7">
     <link rel="stylesheet" href="traderid.css?v=1">
     <link rel="stylesheet" href="perf.css?v=1">
@@ -136,24 +136,21 @@
                                     <g class="hud-rings">
                                         <circle cx="130" cy="125" r="85"/><circle cx="130" cy="125" r="56.5"/><circle cx="130" cy="125" r="28"/>
                                     </g>
-                                    <g class="hud-axes"><line x1="130" y1="125" x2="130" y2="40"/><line x1="130" y1="125" x2="203.6" y2="167.5"/><line x1="130" y1="125" x2="56.4" y2="167.5"/></g>
+                                    <g class="hud-axes" id="hudAxes"></g>
                                     <g class="hud-sweep"><path d="M130 125 L130 40 A85 85 0 0 1 188 62 Z" fill="url(#hudSweep)"/></g>
-                                    <polygon class="hud-poly" id="driverPoly" points="130,117 137,129 123,129"/>
-                                    <g class="hud-dots"><circle id="dotRsi" cx="130" cy="117" r="4"/><circle id="dotEma" cx="137" cy="129" r="4"/><circle id="dotMacd" cx="123" cy="129" r="4"/></g>
-                                    <g class="hud-labels"><text x="130" y="24" text-anchor="middle">RSI</text><text x="212" y="190" text-anchor="start">EMA</text><text x="48" y="190" text-anchor="end">MACD</text></g>
+                                    <polygon class="hud-poly" id="driverPoly" points="130,125 130,125 130,125"/>
+                                    <g class="hud-dots" id="hudDots"></g>
+                                    <g class="hud-labels" id="hudLabels"></g>
                                 </svg>
                             </div>
                             <div class="hud-side">
                                 <div class="hud-verdict"><span>SIGNAL VERDICT</span><b id="hudVerdict">STANDBY</b></div>
                                 <div class="hud-conf"><div class="hud-conf-top"><span>CONFIDENCE</span><b id="hudConfluence">--%</b></div><div class="hud-segs hud-segs-lg" id="hudSegConf"></div></div>
-                                <div class="hud-rows">
-                                    <div class="hud-row"><span>RSI<small>Momentum</small></span><div class="hud-segs" id="hudSegRsi"></div><b id="driverRsiPercent">--%</b></div>
-                                    <div class="hud-row"><span>EMA<small>Trend</small></span><div class="hud-segs" id="hudSegEma"></div><b id="driverEmaPercent">--%</b></div>
-                                    <div class="hud-row"><span>MACD<small>Direction</small></span><div class="hud-segs" id="hudSegMacd"></div><b id="driverMacdPercent">--%</b></div>
-                                </div>
+                                <div class="hud-rows" id="hudRows"></div>
+                                <p class="hud-note" id="hudNote"></p>
                             </div>
                         </div>
-                        <div class="driver-method"><span>HOW THE SIGNAL IS PREDICTED</span><p>RSI measures momentum, EMA confirms the trend, and MACD validates direction. Their weighted agreement produces the final BUY or SELL signal.</p></div>
+                        <div class="driver-method"><span>HOW THE SIGNAL IS PREDICTED</span><p id="driverMethod">RSI measures momentum, EMA confirms the trend, and MACD validates direction. Their weighted agreement produces the final BUY or SELL signal.</p></div>
                     </section>
                 </div>
 
@@ -315,7 +312,7 @@
         window.API_BASE_URL = '/api';
     </script>
     <script src="config.js?v=9"></script>
-    <script src="app.js?v=5.4"></script>
+    <script src="app.js?v=5.5"></script>
     <script src="extras.js?v=4"></script>
     <script src="traderid.js?v=2"></script>
 </body>

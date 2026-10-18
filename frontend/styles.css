@@ -473,3 +473,14 @@ a.nav-item { text-decoration: none; }
     .hud-row { grid-template-columns: 70px minmax(0, 1fr) 40px; gap: 8px; }
 }
 @media (prefers-reduced-motion: reduce) { .hud-sweep, .hud-dots circle { animation: none; } }
+
+/* Signal Drivers: engine-aware rows (v3 has longer names and a trend-strength info row) */
+.hud-row { grid-template-columns: 112px minmax(0, 1fr) 44px; }
+.hud-row span { font-size: 11.5px; letter-spacing: .1em; }
+.hud-row small { letter-spacing: .08em; text-transform: none; font-size: 8.5px; }
+.hud-row.is-info span { color: var(--gold-light); }
+.hud-row.is-info .hud-segs i.on { background: var(--gold-light); box-shadow: 0 0 8px rgba(244,215,123,.6); }
+.hud-note { margin: 2px 0 0; color: rgba(255,255,255,.45); font: 9.5px 'DM Mono', monospace; letter-spacing: .04em; }
+.hud-note[hidden] { display: none; }
+.hud-labels text { font-size: 10px; letter-spacing: .12em; }
+@media (max-width: 700px) { .hud-row { grid-template-columns: 92px minmax(0, 1fr) 40px; } .hud-row span { font-size: 10.5px; } }

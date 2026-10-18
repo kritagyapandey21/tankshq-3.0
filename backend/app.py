@@ -126,6 +126,7 @@ class SignalResponse(BaseModel):
     entry_timestamp: str
     expiry_timestamp: str
     generated_timestamp: str
+    engine: Optional[str] = None   # which signal engine produced it (v2, v3, v3-reversion, v3-reversion-plus)
 
 
 class ServerTimeResponse(BaseModel):

@@ -236,7 +236,8 @@ class SignalAnalyzer:
             "indicator_scores": best_analysis["signals"],
             "generated_at": datetime.now(IST).strftime("%H:%M:%S"),
             "generated_timestamp": datetime.now(IST).isoformat(),
-            "candle_duration": "1 minute"
+            "candle_duration": "1 minute",
+            "engine": SIGNAL_ENGINE,
         }
         
         return signal

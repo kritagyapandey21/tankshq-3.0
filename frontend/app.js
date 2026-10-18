@@ -244,7 +244,7 @@ function displaySignal(signal) {
     $('driverSignal').textContent = `${signal.direction} · ${signal.pair}`;
     const driversPanel = document.querySelector('.drivers-panel');
     if (driversPanel) { driversPanel.classList.remove('is-buy', 'is-sell'); driversPanel.classList.add(signal.direction === 'BUY' ? 'is-buy' : 'is-sell'); }
-    updateDriverHud(signal.indicator_scores, signal.direction, signal.confidence);
+    updateDriverHud(signal.indicator_scores, signal.direction, signal.confidence, signal.engine);
     $('demoMarketView').style.display = 'none';
     $('marketSignalView').style.display = 'block';
     $('signalPair').textContent       = signal.pair;
@@ -464,27 +464,123 @@ function renderSignalHistory() {
 }
 
 
-// ── Signal Drivers HUD: 3-axis radar + LED readouts ──────────────────
-const HUD_AXES = { rsi: [-90, 'Rsi'], ema: [30, 'Ema'], macd: [150, 'Macd'] };
+// ── Signal Drivers HUD: radar + LED readouts, laid out for the engine that made the signal ──────────
 const HUD_CX = 130, HUD_CY = 125, HUD_R = 85, HUD_SEGS = 14, HUD_SEGS_LG = 28;
-const hudState = { rsi: 0, ema: 0, macd: 0, raf: null };
+const SNAP_BACK = { key: 'rsi', label: 'SNAP-BACK', sub: 'RSI · Bollinger · StochRSI' };
+const TREND_AXES = [
+    { key: 'supertrend', label: 'SUPERTREND', sub: 'Trend side' },
+    { key: 'ema', label: 'EMA', sub: 'Trend 9 / 21 / 50' },
+    { key: 'macd', label: 'MACD', sub: 'Momentum' },
+];
+const STRENGTH_ROW = { key: 'strength', label: 'STRENGTH', sub: 'How steady the trend is', info: true };
+const HUD_LAYOUTS = {
+    v2: {
+        axes: [{ key: 'rsi', label: 'RSI', sub: 'Momentum' }, { key: 'ema', label: 'EMA', sub: 'Trend' }, { key: 'macd', label: 'MACD', sub: 'Direction' }],
+        extra: [],
+        note: '',
+        method: 'RSI measures momentum, EMA confirms the trend, and MACD validates direction. Their weighted agreement produces the final BUY or SELL signal.',
+    },
+    v3: {
+        axes: [SNAP_BACK, ...TREND_AXES], extra: [STRENGTH_ROW],
+        note: 'Bars show how much each reading supports this call (50% = neutral).',
+        method: 'TANIX AI 3.0 first measures how steady the market is (trend strength). In a steady trend it follows Supertrend, EMA and MACD; in a choppy market it uses the snap-back reading (RSI, Bollinger Bands and Stochastic RSI) and expects a short pullback. The pair with the clearest setup is chosen.',
+    },
+    'v3-reversion': {
+        axes: [SNAP_BACK, ...TREND_AXES], extra: [STRENGTH_ROW],
+        note: 'Bars show how much each reading supports this call (50% = neutral).',
+        method: 'TANIX AI 3.0 scans every pair for the most over-stretched move and expects a short pullback. The snap-back reading (RSI, Bollinger Bands and Stochastic RSI) decides BUY or SELL. Supertrend, EMA and MACD show the recent trend as context: a low trend score means the signal trades against that move on purpose.',
+    },
+    'v3-reversion-plus': {
+        axes: [SNAP_BACK, ...TREND_AXES], extra: [STRENGTH_ROW],
+        note: 'Bars show how much each reading supports this call (50% = neutral).',
+        method: 'TANIX AI 3.0 scans every pair for the most over-stretched move and expects a short pullback. It only signals when RSI, Bollinger Bands and Stochastic RSI all agree. Supertrend, EMA and MACD show the recent trend as context: a low trend score means the signal trades against that move on purpose.',
+    },
+};
+const hudState = { layout: null, axes: [], values: {}, raf: null };
 
-function hudPoint(key, value) {
+function hudAngle(i, n) {
+    return (-90 + 360 * i / n) * Math.PI / 180;
+}
+function hudPoint(i, n, value) {
     const r = 8 + (HUD_R - 8) * Math.min(100, Math.max(0, value)) / 100;
-    const a = HUD_AXES[key][0] * Math.PI / 180;
+    const a = hudAngle(i, n);
     return [HUD_CX + Math.cos(a) * r, HUD_CY + Math.sin(a) * r];
+}
+function hudSetLayout(engine) {
+    const name = HUD_LAYOUTS[engine] ? engine : 'v2';
+    if (hudState.layout === name) return;
+    hudState.layout = name;
+    const layout = HUD_LAYOUTS[name];
+    hudState.axes = layout.axes;
+    hudState.values = Object.fromEntries(layout.axes.map(a => [a.key, 0]));
+    try { localStorage.setItem('tanix_engine', name); } catch (e) { /* ignore */ }
+
+    const svgNS = 'http://www.w3.org/2000/svg', n = layout.axes.length;
+    const axes = $('hudAxes'), dots = $('hudDots'), labels = $('hudLabels');
+    if (!axes) return;
+    axes.textContent = ''; dots.textContent = ''; labels.textContent = '';
+    layout.axes.forEach((ax, i) => {
+        const a = hudAngle(i, n), tipX = HUD_CX + Math.cos(a) * HUD_R, tipY = HUD_CY + Math.sin(a) * HUD_R;
+        const line = document.createElementNS(svgNS, 'line');
+        line.setAttribute('x1', HUD_CX); line.setAttribute('y1', HUD_CY);
+        line.setAttribute('x2', tipX.toFixed(1)); line.setAttribute('y2', tipY.toFixed(1));
+        axes.appendChild(line);
+        const dot = document.createElementNS(svgNS, 'circle');
+        dot.setAttribute('r', '4'); dot.setAttribute('cx', HUD_CX); dot.setAttribute('cy', HUD_CY);
+        dot.dataset.key = ax.key;
+        dots.appendChild(dot);
+        // label: above the top tip, below the bottom tip, under the tip for the sides (kept inside the box)
+        const text = document.createElementNS(svgNS, 'text');
+        const cos = Math.cos(a), sin = Math.sin(a);
+        let x = tipX, y = tipY;
+        if (sin < -0.7) y -= 12;
+        else if (sin > 0.7) y += 20;
+        else { y += 22; x = Math.min(222, Math.max(38, tipX - cos * 12)); }
+        text.setAttribute('x', x.toFixed(1)); text.setAttribute('y', y.toFixed(1));
+        text.setAttribute('text-anchor', 'middle');
+        text.textContent = ax.label;
+        labels.appendChild(text);
+    });
+    const rows = $('hudRows');
+    rows.textContent = '';
+    [...layout.axes, ...layout.extra].forEach(ax => {
+        const row = document.createElement('div');
+        row.className = 'hud-row' + (ax.info ? ' is-info' : '');
+        const label = document.createElement('span');
+        label.textContent = ax.label;
+        const small = document.createElement('small');
+        small.textContent = ax.sub;
+        label.appendChild(small);
+        const segs = document.createElement('div');
+        segs.className = 'hud-segs'; segs.id = 'hudSeg-' + ax.key;
+        const pct = document.createElement('b');
+        pct.id = 'hudPct-' + ax.key; pct.textContent = '--%';
+        row.append(label, segs, pct);
+        rows.appendChild(row);
+    });
+    $('hudNote').textContent = layout.note;
+    $('hudNote').hidden = !layout.note;
+    $('driverMethod').textContent = layout.method;
+    hudDraw(hudState.values);
 }
 function hudDraw(v) {
     const poly = $('driverPoly');
-    if (!poly) return;
-    const pts = Object.keys(HUD_AXES).map(k => hudPoint(k, v[k]));
+    if (!poly || !hudState.axes.length) return;
+    const n = hudState.axes.length;
+    const pts = hudState.axes.map((ax, i) => hudPoint(i, n, v[ax.key] || 0));
     poly.setAttribute('points', pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '));
-    Object.keys(HUD_AXES).forEach((k, i) => {
-        const dot = $('dot' + HUD_AXES[k][1]);
+    [...$('hudDots').children].forEach((dot, i) => {
         dot.setAttribute('cx', pts[i][0].toFixed(1));
         dot.setAttribute('cy', pts[i][1].toFixed(1));
     });
 }
+// draw the last-known layout straight away, before the first signal arrives
+document.addEventListener('DOMContentLoaded', () => {
+    if (!$('hudAxes')) return;
+    let last = 'v2';
+    try { last = localStorage.getItem('tanix_engine') || 'v2'; } catch (e) { /* ignore */ }
+    hudSetLayout(last);
+});
 function hudSegments(id, count, value) {
     const box = $(id);
     if (!box) return;
@@ -498,28 +594,34 @@ function hudSegments(id, count, value) {
         seg.style.transitionDelay = (i * 18) + 'ms';
     });
 }
-function updateDriverHud(scores, direction, confidence) {
-    const target = { rsi: +scores.rsi || 0, ema: +scores.ema || 0, macd: +scores.macd || 0 };
-    // Use the backend's own confidence so this matches the signal toast; fall back to the average of the three scores.
-    const conf = Math.round(Number.isFinite(+confidence) && confidence !== null && confidence !== undefined ? +confidence : (target.rsi + target.ema + target.macd) / 3);
+function updateDriverHud(scores, direction, confidence, engine) {
+    // the backend says which engine made the signal; older backends don't, so infer it from the scores
+    hudSetLayout(engine || ('supertrend' in scores ? 'v3-reversion-plus' : 'v2'));
+    const layout = HUD_LAYOUTS[hudState.layout];
+    const rows = [...layout.axes, ...layout.extra];
+    const target = Object.fromEntries(layout.axes.map(ax => [ax.key, +scores[ax.key] || 0]));
+    // Use the backend's own confidence so this matches the signal toast; fall back to the average of the scores.
+    const avg = Object.values(target).reduce((s, x) => s + x, 0) / Math.max(1, layout.axes.length);
+    const conf = Math.round(Number.isFinite(+confidence) && confidence !== null && confidence !== undefined ? +confidence : avg);
     const verdict = $('hudVerdict');
     verdict.textContent = direction || 'STANDBY';
     verdict.className = direction ? direction.toLowerCase() : '';
     $('hudConfluence').textContent = `${conf}%`;
     hudSegments('hudSegConf', HUD_SEGS_LG, conf);
-    Object.keys(HUD_AXES).forEach(k => {
-        const name = HUD_AXES[k][1];
-        $('driver' + name + 'Percent').textContent = `${Math.round(target[k])}%`;
-        hudSegments('hudSeg' + name, HUD_SEGS, target[k]);
+    rows.forEach(ax => {
+        const v = +scores[ax.key];
+        const pct = $('hudPct-' + ax.key);
+        if (pct) pct.textContent = Number.isFinite(v) ? `${Math.round(v)}%` : '--%';
+        hudSegments('hudSeg-' + ax.key, HUD_SEGS, Number.isFinite(v) ? v : 0);
     });
     // morph the radar polygon from its current shape to the new one
-    const from = { rsi: hudState.rsi, ema: hudState.ema, macd: hudState.macd };
+    const from = { ...hudState.values };
     const t0 = performance.now(), DURATION = 900;
     cancelAnimationFrame(hudState.raf);
     (function step(now) {
         const t = Math.min(1, (now - t0) / DURATION), e = 1 - Math.pow(1 - t, 3);
         const cur = {};
-        Object.keys(target).forEach(k => { cur[k] = from[k] + (target[k] - from[k]) * e; hudState[k] = cur[k]; });
+        Object.keys(target).forEach(k => { cur[k] = (from[k] || 0) + (target[k] - (from[k] || 0)) * e; hudState.values[k] = cur[k]; });
         hudDraw(cur);
         if (t < 1) hudState.raf = requestAnimationFrame(step);
     })(t0);
