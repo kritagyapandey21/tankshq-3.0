@@ -31,7 +31,33 @@ def admin_key() -> str:
         return ""
 
 
+def report(path: str) -> None:
+    """Per pair: candles saved, hours covered, and how many continuous stretches (gaps split them)."""
+    by_pair = {}
+    with open(path, encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            by_pair.setdefault(row["pair"], []).append(int(row["time"]))
+    total = sum(len(v) for v in by_pair.values())
+    print(f"{len(by_pair)} pairs, {total} candles\n{'pair':<14} {'candles':>8} {'hours':>6} {'stretches':>9} {'longest':>8}  first -> last (UTC)")
+    for pair, ts in sorted(by_pair.items(), key=lambda x: -len(x[1])):
+        ts.sort()
+        runs, run, longest = 1, 1, 1
+        for a, b in zip(ts, ts[1:]):
+            if b - a == 60:
+                run += 1
+            else:
+                runs += 1
+                run = 1
+            longest = max(longest, run)
+        first = datetime.fromtimestamp(ts[0], timezone.utc).strftime("%m-%d %H:%M")
+        last = datetime.fromtimestamp(ts[-1], timezone.utc).strftime("%m-%d %H:%M")
+        print(f"{pair:<14} {len(ts):>8} {len(ts) / 60:>6.1f} {runs:>9} {longest / 60:>7.1f}h  {first} -> {last}")
+
+
 def main():
+    if len(sys.argv) == 3 and sys.argv[1] == "--report":
+        report(sys.argv[2])
+        return
     ap = argparse.ArgumentParser()
     ap.add_argument("--api", default="http://127.0.0.1:8010")
     ap.add_argument("--out", default="candles.csv")
