@@ -244,7 +244,7 @@ function displaySignal(signal) {
     $('driverSignal').textContent = `${signal.direction} · ${signal.pair}`;
     const driversPanel = document.querySelector('.drivers-panel');
     if (driversPanel) { driversPanel.classList.remove('is-buy', 'is-sell'); driversPanel.classList.add(signal.direction === 'BUY' ? 'is-buy' : 'is-sell'); }
-    updateDriverHud(signal.indicator_scores, signal.direction, signal.confidence, signal.engine);
+    updateDriverHud(signal.indicator_scores, signal.direction, signal.confidence);
     $('demoMarketView').style.display = 'none';
     $('marketSignalView').style.display = 'block';
     $('signalPair').textContent       = signal.pair;
@@ -269,8 +269,14 @@ function displaySignal(signal) {
     // Confidence ring
     setConfidenceRing(signal.confidence, signal.direction);
 
-    // Indicator bars (stagger via CSS delay is handled by the fill elements)
+    // Indicator bars in the (hidden) detailed signal view (stagger via CSS delay is handled by the fill elements)
     const scores = signal.indicator_scores;
+    const setIndicator = (barId, pctId, value) => {
+        const bar = $(barId), pct = $(pctId);
+        const v = Math.min(100, Math.max(0, +value || 0));
+        if (bar) bar.style.width = `${v}%`;
+        if (pct) pct.textContent = `${Math.round(v)}%`;
+    };
     setIndicator('rsiScore',  'rsiPercent',  scores.rsi);
     setIndicator('emaScore',  'emaPercent',  scores.ema);
     setIndicator('macdScore', 'macdPercent', scores.macd);
@@ -466,7 +472,7 @@ function renderSignalHistory() {
 
 // ── Signal Drivers HUD: radar + LED readouts, laid out for the engine that made the signal ──────────
 const HUD_CX = 130, HUD_CY = 125, HUD_R = 85, HUD_SEGS = 14, HUD_SEGS_LG = 28;
-// v3 layouts: the three snap-back readings DECIDE the signal (radar + bars, averaged into SETUP STRENGTH);
+// The three snap-back readings DECIDE the signal (radar + bars, averaged into SETUP STRENGTH);
 // Supertrend / EMA / MACD are MARKET CONTEXT shown as a trend direction, and trend steadiness is information only.
 const SNAP_AXES = [
     { key: 'osc_rsi', label: 'RSI', sub: 'Overbought / oversold' },
@@ -479,32 +485,11 @@ const CONTEXT_ROWS = [
     { key: 'macd', label: 'MACD', sub: 'Momentum', kind: 'trend' },
     { key: 'strength', label: 'STEADINESS', sub: 'How smooth the move is', kind: 'info' },
 ];
-const V3_BASE = {
+const HUD_LAYOUT = {
     axes: SNAP_AXES,
     sections: [['WHAT DECIDES THE SIGNAL', SNAP_AXES], ['MARKET CONTEXT', CONTEXT_ROWS]],
     confLabel: 'SETUP STRENGTH',
-    explain: true,
-};
-const HUD_LAYOUTS = {
-    v2: {
-        axes: [{ key: 'rsi', label: 'RSI', sub: 'Momentum' }, { key: 'ema', label: 'EMA', sub: 'Trend' }, { key: 'macd', label: 'MACD', sub: 'Direction' }],
-        sections: null,
-        confLabel: 'CONFIDENCE',
-        explain: false,
-        method: 'RSI measures momentum, EMA confirms the trend, and MACD validates direction. Their weighted agreement produces the final BUY or SELL signal.',
-    },
-    v3: {
-        ...V3_BASE,
-        method: 'TANIX AI 3.0 first checks how steady the market is. In a steady trend it follows Supertrend, EMA and MACD; in a choppy market it uses the snap-back readings (RSI, Bollinger Bands, Stochastic RSI) and expects a short pullback. Setup strength shows how clear the setup is, not a guaranteed result.',
-    },
-    'v3-reversion': {
-        ...V3_BASE,
-        method: 'TANIX AI 3.0 scans every pair for the most over-stretched move and expects a short pullback. RSI, Bollinger Bands and Stochastic RSI decide the direction, and setup strength is their average. Supertrend, EMA and MACD show which way the price has been moving. Setup strength shows how clear the setup is, not a guaranteed result.',
-    },
-    'v3-reversion-plus': {
-        ...V3_BASE,
-        method: 'TANIX AI 3.0 scans every pair for the most over-stretched move and expects a short pullback. It only signals when RSI, Bollinger Bands and Stochastic RSI all agree; setup strength is their average. Supertrend, EMA and MACD show which way the price has been moving. Setup strength shows how clear the setup is, not a guaranteed result.',
-    },
+    method: 'TANIX AI 3.0 scans every pair for the most over-stretched move and expects a short pullback. It only signals when RSI, Bollinger Bands and Stochastic RSI all agree; setup strength is their average. Supertrend, EMA and MACD show which way the price has been moving. Setup strength shows how clear the setup is, not a guaranteed result.',
 };
 const hudState = { layout: null, axes: [], values: {}, raf: null };
 
@@ -516,14 +501,12 @@ function hudPoint(i, n, value) {
     const a = hudAngle(i, n);
     return [HUD_CX + Math.cos(a) * r, HUD_CY + Math.sin(a) * r];
 }
-function hudSetLayout(engine) {
-    const name = HUD_LAYOUTS[engine] ? engine : 'v2';
-    if (hudState.layout === name) return;
-    hudState.layout = name;
-    const layout = HUD_LAYOUTS[name];
+function hudSetLayout() {
+    if (hudState.layout) return;
+    hudState.layout = 'v3-reversion-plus';
+    const layout = HUD_LAYOUT;
     hudState.axes = layout.axes;
     hudState.values = Object.fromEntries(layout.axes.map(a => [a.key, 0]));
-    try { localStorage.setItem('tanix_engine', name); } catch (e) { /* ignore */ }
 
     const svgNS = 'http://www.w3.org/2000/svg', n = layout.axes.length;
     const axes = $('hudAxes'), dots = $('hudDots'), labels = $('hudLabels');
@@ -553,7 +536,7 @@ function hudSetLayout(engine) {
     });
     const rows = $('hudRows');
     rows.textContent = '';
-    const sections = layout.sections || [[null, layout.axes]];
+    const sections = layout.sections;
     sections.forEach(([title, list]) => {
         if (title) {
             const h = document.createElement('div');
@@ -594,13 +577,8 @@ function hudDraw(v) {
         dot.setAttribute('cy', pts[i][1].toFixed(1));
     });
 }
-// draw the last-known layout straight away, before the first signal arrives
-document.addEventListener('DOMContentLoaded', () => {
-    if (!$('hudAxes')) return;
-    let last = 'v2';
-    try { last = localStorage.getItem('tanix_engine') || 'v2'; } catch (e) { /* ignore */ }
-    hudSetLayout(last);
-});
+// draw the panel straight away, before the first signal arrives
+document.addEventListener('DOMContentLoaded', () => { if ($('hudAxes')) hudSetLayout(); });
 function hudSegments(id, count, value) {
     const box = $(id);
     if (!box) return;
@@ -614,20 +592,17 @@ function hudSegments(id, count, value) {
         seg.style.transitionDelay = (i * 18) + 'ms';
     });
 }
-function updateDriverHud(scores, direction, confidence, engine) {
-    // the backend says which engine made the signal; older backends don't, so infer it from the scores
-    hudSetLayout(engine || ('supertrend' in scores ? 'v3-reversion-plus' : 'v2'));
-    const layout = HUD_LAYOUTS[hudState.layout];
+function updateDriverHud(scores, direction, confidence) {
+    hudSetLayout();
+    const layout = HUD_LAYOUT;
     scores = { ...scores };
-    if (layout.sections && !('osc_rsi' in scores)) {           // older backend: only the combined snap-back score
+    if (!('osc_rsi' in scores)) {           // older backend: only the combined snap-back score
         scores.osc_rsi = scores.osc_bollinger = scores.osc_stoch_rsi = scores.rsi;
     }
     const target = Object.fromEntries(layout.axes.map(ax => [ax.key, +scores[ax.key] || 0]));
     const avg = Object.values(target).reduce((s, x) => s + x, 0) / Math.max(1, layout.axes.length);
-    // snap-back engines: setup strength IS the average of the three deciding bars (the backend sends the same number)
-    const snapEngine = hudState.layout === 'v3-reversion' || hudState.layout === 'v3-reversion-plus';
-    const backend = Number.isFinite(+confidence) && confidence !== null && confidence !== undefined ? +confidence : avg;
-    const conf = Math.round(snapEngine ? Math.min(99, avg) : backend);
+    // setup strength IS the average of the three deciding bars (the backend sends the same number)
+    const conf = Math.round(Math.min(99, avg));
     const verdict = $('hudVerdict');
     verdict.textContent = direction || 'STANDBY';
     verdict.className = direction ? direction.toLowerCase() : '';
@@ -636,7 +611,7 @@ function updateDriverHud(scores, direction, confidence, engine) {
 
     const callDir = direction === 'BUY' ? 1 : -1;
     const trendDirs = [];
-    (layout.sections ? layout.sections.flatMap(s => s[1]) : layout.axes).forEach(ax => {
+    layout.sections.flatMap(s => s[1]).forEach(ax => {
         const v = +scores[ax.key];
         const pct = $('hudPct-' + ax.key);
         const row = pct ? pct.parentElement : null;
@@ -661,7 +636,7 @@ function updateDriverHud(scores, direction, confidence, engine) {
 
     // one plain-language line that ties the numbers together
     const note = $('hudNote');
-    if (layout.explain && direction) {
+    if (direction) {
         const up = trendDirs.filter(d => d > 0).length, down = trendDirs.filter(d => d < 0).length;
         const trend = up > down ? 1 : down > up ? -1 : 0;
         const word = d => (d > 0 ? 'UP' : 'DOWN');
@@ -669,7 +644,7 @@ function updateDriverHud(scores, direction, confidence, engine) {
         if (trend === 0) text = 'The market has no clear trend, so the signal is based on the snap-back readings alone.';
         else if (trend !== callDir) text = `Price has been moving ${word(trend)}. The snap-back readings say it has stretched too far, so the signal expects a short pullback ${trend > 0 ? 'down' : 'up'} (${direction}).`;
         else text = `The trend (${word(trend)}) and the snap-back readings point the same way (${direction}).`;
-        note.textContent = text + (snapEngine ? ` Setup strength ${conf}% = average of RSI, Bollinger and Stoch RSI.` : '');
+        note.textContent = text + ` Setup strength ${conf}% = average of RSI, Bollinger and Stoch RSI.`;
         note.hidden = false;
     } else {
         note.hidden = true;
@@ -685,14 +660,6 @@ function updateDriverHud(scores, direction, confidence, engine) {
         hudDraw(cur);
         if (t < 1) hudState.raf = requestAnimationFrame(step);
     })(t0);
-}
-
-function setIndicator(barId, pctId, value) {
-    const pct = Math.min(100, Math.max(0, value));
-    const bar = $(barId);
-    if (bar.hasAttribute('data-arc')) bar.style.strokeDashoffset = String(100 - pct);   // circular gauge
-    else bar.style.width = `${pct}%`;
-    $(pctId).textContent       = `${Math.round(pct)}%`;
 }
 
 // ── Countdown timer ─────────────────────────────────────────────────

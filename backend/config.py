@@ -42,12 +42,6 @@ INDICATORS_CONFIG = {
     }
 }
 
-# Confidence Scoring Weights
-CONFIDENCE_WEIGHTS: Dict[str, float] = {
-    "rsi_signal":        0.375,
-    "ema_trend":         0.375,
-    "macd_confirmation": 0.25,
-}
 
 # Data Fetching
 CANDLES_TO_FETCH = 100

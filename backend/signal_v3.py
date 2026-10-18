@@ -1,14 +1,9 @@
-"""Signal engine v3: Supertrend + EMA trend stack, filtered by a trend-strength regime.
+"""Signal engine: v3-reversion-plus (the only engine).
 
-Why this exists
----------------
-The old engine voted RSI reversals together with trend-following EMA/MACD, which pull in opposite directions.
-v3 first asks "is this market trending or ranging?" (Kaufman Efficiency Ratio) and then listens to the right tools:
-
-  trending market -> Supertrend + EMA stack (9/21/50) + MACD momentum
-  ranging market  -> RSI + Bollinger %B + Stochastic RSI (mean reversion)
-
-and blends the two by how trending the market is.
+For each pair it measures how over-stretched the price is with RSI, Bollinger %B and Stochastic RSI, and only calls
+a direction when all three agree (expecting a short pullback). Supertrend, the EMA 9/21/50 stack, MACD and the
+Kaufman Efficiency Ratio (trend steadiness) are computed as market context for the Signal Drivers panel; they do not
+decide the call.
 
 Data note
 ---------
@@ -16,7 +11,7 @@ Pocket Option's candle feed gives ONE price per minute (open = high = low = clos
 on closing prices only. Supertrend therefore uses a close-to-close ATR (the average absolute change between closes)
 instead of a high/low true range, and bands are drawn around the close.
 
-Everything returns a score in [-1, +1] per component (positive = bullish), then a single signed score.
+Every component is a score in [-1, +1] (positive = bullish).
 """
 
 from typing import Dict, List, Optional
@@ -27,9 +22,6 @@ import numpy as np
 ST_PERIOD = 10          # Supertrend ATR period
 ST_MULT = 2.0           # Supertrend band multiplier (3.0 = slower, fewer flips)
 KER_PERIOD = 10         # efficiency-ratio window
-KER_RANGE = 0.25        # at/below this the market counts as ranging
-KER_TREND = 0.50        # at/above this the market counts as trending
-MIN_SCORE = 0.15        # |score| below this = no clear signal
 
 
 # --------------------------------------------------------------------------------------------------
@@ -197,42 +189,9 @@ def reversion_plus(comp: Dict[str, float], min_score: float = 0.25, need_agree: 
     }
 
 
-def blend(comp: Dict[str, float], ker_range: float = KER_RANGE, ker_trend: float = KER_TREND) -> Dict:
-    """Blend the trend stack and the mean-reversion stack by how trending the market is, then call a direction."""
-    trend_comp = comp["supertrend"] * 0.4 + comp["ema"] * 0.35 + comp["macd"] * 0.25
-    revert_comp = comp["rsi"] * 0.4 + comp["bollinger"] * 0.35 + comp["stoch_rsi"] * 0.25
-    w_trend = clip((comp["ker"] - ker_range) / max(ker_trend - ker_range, 1e-9), 0.0, 1.0)
-    score = w_trend * trend_comp + (1 - w_trend) * revert_comp
-
-    direction = "CALL" if score >= MIN_SCORE else ("PUT" if score <= -MIN_SCORE else None)
-    regime = "TRENDING" if w_trend >= 0.67 else ("RANGING" if w_trend <= 0.33 else "MIXED")
-    return {
-        "score": float(score),
-        "direction": direction,
-        "confidence": round(50 + 45 * min(1.0, abs(score) / 0.8), 1) if direction else 0.0,
-        "regime": regime,
-        "ker": comp["ker"],
-        "trend_score": float(trend_comp),
-        "reversion_score": float(revert_comp),
-        "components": comp,
-    }
-
-
 def analyze_reversion_plus(closes: List[float]) -> Optional[Dict]:
-    """v3-reversion-plus: mean reversion that only trades when RSI, Bollinger and StochRSI all agree.
-    In the 1-minute backtest the extra 'skip trends' / 'fade the jump' filters lowered accuracy, so only the
-    agreement rule is kept (it tied plain v3-reversion while dropping conflicting signals)."""
+    """v3-reversion-plus: mean reversion that only signals when RSI, Bollinger and StochRSI all agree."""
     c = np.asarray(closes, dtype=float)
     if len(c) < 60 or not np.isfinite(c).all():
         return None
     return reversion_plus(components(c), min_score=0.25, need_agree=True)
-
-
-def analyze(closes: List[float],
-            st_period: int = ST_PERIOD, st_mult: float = ST_MULT,
-            ker_range: float = KER_RANGE, ker_trend: float = KER_TREND) -> Optional[Dict]:
-    """Full v3 analysis of one pair's closing prices, or None if there is not enough clean data."""
-    c = np.asarray(closes, dtype=float)
-    if len(c) < 60 or not np.isfinite(c).all():
-        return None
-    return blend(components(c, st_period, st_mult), ker_range, ker_trend)

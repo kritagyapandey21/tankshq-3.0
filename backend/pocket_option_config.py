@@ -94,11 +94,6 @@ POCKET_OPTION_ASSETS_LIVE = [
     {"id": "49", "name": "BNB/USD"},
 ]
 
-POCKET_OPTION_CONFIDENCE_WEIGHTS = {
-    "rsi_signal":        0.375,
-    "ema_trend":         0.375,
-    "macd_confirmation": 0.25,
-}
 
 MIN_CONFIDENCE_THRESHOLD = 40
 DEFAULT_CANDLES_TO_FETCH = 100

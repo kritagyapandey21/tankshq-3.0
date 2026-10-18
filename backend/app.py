@@ -41,7 +41,7 @@ import performers
 from market_data import MarketDataFetcher
 from analysis import SignalAnalyzer
 from pocket_option_api import PocketOptionSessionManager, PocketOptionDataFetcher
-from pocket_option_config import POCKET_OPTION_ASSETS, POCKET_OPTION_CONFIDENCE_WEIGHTS
+from pocket_option_config import POCKET_OPTION_ASSETS
 from timezone_utils import DEFAULT_TIMEZONE, is_valid_timezone, normalize_timezone, timezone_catalog
 from trader_store import (
     get_timezone, set_timezone, claim_session, touch_session, release_session,
