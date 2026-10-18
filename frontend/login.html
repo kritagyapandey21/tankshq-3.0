@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="extras.css?v=7">
     <link rel="stylesheet" href="login-fx.css?v=8">
     <link rel="stylesheet" href="perf.css?v=1">
+    <link rel="stylesheet" href="login-layout.css?v=1">
 </head>
 <body data-page="login">
     <canvas id="bgCanvas"></canvas>
@@ -50,15 +51,6 @@
             <a href="./" class="brand-home-link" aria-label="Back to TANIX AI 3.0 home"><div><div class="brand-name">LEARN WITH <span>TANISHQ</span></div><div class="brand-tagline">Your Gateway to Intelligent Markets</div></div></a>
         </header>
 
-        <div class="login-sentiment-layer" aria-hidden="true">
-            <div class="sentiment-badge sentiment-bullish">
-                <span class="sentiment-dot"></span><span><b>BULLISH MOMENTUM</b><small>// +78%</small></span>
-            </div>
-            <div class="sentiment-badge sentiment-bearish">
-                <span class="sentiment-dot"></span><span><b>BEARISH HEDGE</b><small>// -22%</small></span>
-            </div>
-        </div>
-
         <div class="login-stage">
             <div class="login-glows" aria-hidden="true">
                 <span class="login-glow login-glow-gold"></span>
@@ -90,15 +82,29 @@
             <p class="signup-copy">Don't know how to use TANIX AI 3.0?  <a id="tutorialLink" href="./#steps">Click here</a></p>
         </main>
         </div>
-        <div id="loginClock" class="login-clock" aria-live="polite">--:--:--</div>
-        <footer class="login-footer">
-            <div class="lf-social">
-                <a data-link="telegramUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
-                <a data-link="youtubeUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
-                <a data-link="instagramUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <div class="login-bottom">
+            <div class="login-bottom-side" aria-hidden="true">
+                <div class="sentiment-badge sentiment-bullish">
+                <span class="sentiment-dot"></span><span><b>BULLISH MOMENTUM</b><small>// +78%</small></span>
             </div>
-            <div>© 2026 Learn With Tanishq. All rights reserved. <span>Secure Login (SSL)</span></div>
-        </footer>
+            </div>
+            <div class="login-bottom-center">
+            <div id="loginClock" class="login-clock" aria-live="polite">--:--:--</div>
+            <footer class="login-footer">
+                <div class="lf-social">
+                    <a data-link="telegramUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="Telegram"><i class="fa-brands fa-telegram"></i></a>
+                    <a data-link="youtubeUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    <a data-link="instagramUrl" href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+                <div>© 2026 Learn With Tanishq. All rights reserved. <span>Secure Login (SSL)</span></div>
+            </footer>
+            </div>
+            <div class="login-bottom-side is-right" aria-hidden="true">
+                <div class="sentiment-badge sentiment-bearish">
+                <span class="sentiment-dot"></span><span><b>BEARISH HEDGE</b><small>// -22%</small></span>
+            </div>
+            </div>
+        </div>
     </div>
     <script>
         window.API_BASE_URL = '/api';

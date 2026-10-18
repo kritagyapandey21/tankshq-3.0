@@ -1,0 +1,109 @@
+/* Login page layout (loaded last): brand at the top, card in the middle, one tidy bottom bar
+   (bullish badge | clock + social + copyright | bearish badge). Nothing is absolutely stacked on top of the card,
+   so nothing can overlap it. ID selectors so this wins over the older layered rules. */
+
+#loginScreen {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* middle: the card, vertically centred in the space that is left */
+#loginScreen .login-stage {
+    flex: 1 0 auto;
+    width: 100%;
+    max-width: none;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 88px 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* a little more breathing room inside the card, without making it taller than the screen */
+#loginScreen .login-card { padding: 34px 38px 28px; }
+#loginScreen .login-heading h1 { margin-bottom: 8px; }
+#loginScreen .login-form { margin-top: 22px; }
+#loginScreen .btn-access { margin-top: 6px; }
+#loginScreen .signup-copy { margin: 0; font-size: 13px; line-height: 1.5; text-align: center; color: rgba(245,245,247,.62); }
+#loginScreen .login-form + .signup-copy { margin-top: 20px; }
+#loginScreen .signup-copy + .signup-copy { margin-top: 6px; }
+#loginScreen .signup-copy a { color: var(--gold-light); font-weight: 700; text-decoration: none; }
+#loginScreen .signup-copy a:hover { text-decoration: underline; }
+
+/* bottom bar */
+#loginScreen .login-bottom {
+    position: relative;
+    z-index: 5;
+    flex: none;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 6px 28px 18px;
+}
+#loginScreen .login-bottom-side { display: flex; justify-content: flex-start; min-width: 0; }
+#loginScreen .login-bottom-side.is-right { justify-content: flex-end; }
+#loginScreen .login-bottom .sentiment-badge {
+    position: static;
+    inset: auto;
+    transform: none;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    margin: 0;
+    padding: 9px 16px;
+}
+#loginScreen .login-bottom-center { display: grid; justify-items: center; gap: 8px; }
+#loginScreen .login-bottom .login-clock,
+#loginScreen .login-bottom .login-footer {
+    position: static;
+    inset: auto;
+    transform: none;
+    margin: 0;
+}
+#loginScreen .login-bottom .login-clock { font-size: 13px; }
+#loginScreen .login-bottom .login-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 10.5px;
+    letter-spacing: .06em;
+    white-space: normal;
+    text-align: center;
+    color: rgba(245,245,247,.5);
+}
+
+/* short laptop screens: keep everything visible without scrolling */
+@media (max-height: 760px) and (min-width: 701px) {
+    #loginScreen .login-stage { padding-top: 70px; padding-bottom: 8px; }
+    #loginScreen .login-card { padding: 22px 34px 20px; }
+    #loginScreen .login-bottom-center { gap: 5px; }
+    #loginScreen .login-heading > p:last-child { margin-bottom: 0; }
+    #loginScreen .login-form { margin-top: 16px; gap: 4px; }
+    #loginScreen .login-form + .signup-copy { margin-top: 14px; }
+    #loginScreen .login-bottom { padding-bottom: 12px; }
+}
+
+/* phones: card first, then the badges side by side, then clock + footer */
+@media (max-width: 700px) {
+    #loginScreen .login-stage { padding: 72px 12px 14px; align-items: flex-start; }
+    #loginScreen .login-card { padding: 26px 20px 22px; }
+    #loginScreen .login-bottom {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: "bull bear" "center center";
+        gap: 10px;
+        padding: 4px 12px 16px;
+    }
+    #loginScreen .login-bottom-side { grid-area: bull; }
+    #loginScreen .login-bottom-side.is-right { grid-area: bear; }
+    #loginScreen .login-bottom-center { grid-area: center; }
+    #loginScreen .login-bottom .sentiment-badge { padding: 6px 10px; font-size: 10px; }
+    #loginScreen .login-bottom .login-footer { font-size: 9px; }
+}
