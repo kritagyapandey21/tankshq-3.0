@@ -15,8 +15,30 @@ A session string gives full access to that Telegram account, so never commit it 
 from telethon.sessions import StringSession
 from telethon.sync import TelegramClient
 
-api_id = int(input("API ID (numbers only): ").strip())
-api_hash = input("API hash: ").strip()
+import re
+import sys
+
+
+def ask_api_id() -> int:
+    raw = input("API ID (the short number from my.telegram.org, NOT your phone number): ").strip()
+    if not raw.isdigit() or not (1 <= int(raw) <= 2**31 - 1) or len(raw) > 9:
+        sys.exit("That is not an API ID. API IDs are 5-9 digits (for example 39100979). "
+                 "A phone number goes in later, when it asks for your phone.")
+    return int(raw)
+
+
+def ask_api_hash() -> str:
+    raw = input("API hash (32 letters and numbers): ").strip()
+    if not re.fullmatch(r"[0-9a-fA-F]{32}", raw):
+        sys.exit("That is not an API hash. It is exactly 32 characters (0-9 and a-f), shown on my.telegram.org/apps.")
+    return raw
+
+
+api_id = ask_api_id()
+api_hash = ask_api_hash()
+print("\nNext it asks for your PHONE (with the country code, e.g. +91...), then the code Telegram sends you,\n"
+      "then your two-step password if you have one (nothing shows on screen while you type it).\n"
+      "If the password is wrong 3 times Telegram blocks logins for an hour or more, so check it first.\n")
 
 with TelegramClient(StringSession(), api_id, api_hash) as client:   # asks for phone, code and 2FA password
     me = client.get_me()

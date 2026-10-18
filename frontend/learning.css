@@ -1,0 +1,20 @@
+/* Learning material section (member hub) */
+.learn-intro { margin: 8px 0 24px; max-width: 640px; color: var(--soft); font-size: 15px; line-height: 1.6; }
+.learn-card .icon-box { margin-bottom: 18px; }
+.learn-card h3 { margin-top: 0; }
+.learn-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.learn-meta span { padding: 3px 10px; color: var(--gold-light); font: 500 11px var(--mono); letter-spacing: .06em; border: 1px solid var(--gold-line); border-radius: 999px; background: var(--gold-wash); }
+.learn-meta span:first-child { color: #171108; border-color: transparent; background: linear-gradient(110deg, var(--gold-deep), var(--gold-light), var(--gold)); font-weight: 700; }
+.learn-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1000px) { .learn-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+    .learn-grid { grid-template-columns: minmax(0, 1fr); }
+    .learn-intro { font-size: 13px; margin-bottom: 16px; }
+    .learn-meta { margin-top: 10px; gap: 6px; } .learn-meta span { font-size: 10px; padding: 2px 8px; }
+}
+
+/* a lone last card sits in the middle of its row instead of hugging the left edge */
+@media (min-width: 1001px) { .learn-grid > .learn-card:last-child:nth-child(3n + 1) { grid-column: 2; } }
+@media (min-width: 641px) and (max-width: 1000px) {
+    .learn-grid > .learn-card:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 11px); }
+}
