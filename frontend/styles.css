@@ -484,3 +484,19 @@ a.nav-item { text-decoration: none; }
 .hud-note[hidden] { display: none; }
 .hud-labels text { font-size: 10px; letter-spacing: .12em; }
 @media (max-width: 700px) { .hud-row { grid-template-columns: 92px minmax(0, 1fr) 40px; } .hud-row span { font-size: 10.5px; } }
+
+/* Signal Drivers v3: two sections, trend shown as direction */
+.hud-section { margin-top: 6px; padding-top: 6px; color: rgba(255,255,255,.5); font: 600 9px 'DM Mono', monospace; letter-spacing: .2em; border-top: 1px solid rgba(255,255,255,.07); }
+.hud-rows .hud-section:first-child { margin-top: 0; padding-top: 0; border-top: 0; }
+.hud-row.is-trend span, .hud-row.is-trend b { color: rgba(255,255,255,.75); }
+.hud-row.is-trend .hud-segs i.on { background: rgba(255,255,255,.55); box-shadow: none; }
+.hud-row.is-trend.is-up b, .hud-row.is-trend.is-up span { color: var(--green); }
+.hud-row.is-trend.is-up .hud-segs i.on { background: var(--green); box-shadow: 0 0 6px rgba(57,229,140,.5); }
+.hud-row.is-trend.is-down b, .hud-row.is-trend.is-down span { color: var(--ruby); }
+.hud-row.is-trend.is-down .hud-segs i.on { background: var(--ruby); box-shadow: 0 0 6px rgba(224,91,107,.5); }
+.hud-row.is-trend b { font-size: 12px; white-space: nowrap; }
+.hud-row.is-info span, .hud-row.is-info b { color: var(--gold-light); }
+.hud-row.is-info .hud-segs i.on { background: var(--gold-light); box-shadow: 0 0 6px rgba(244,215,123,.5); }
+.hud-row { grid-template-columns: 112px minmax(0, 1fr) 62px; }
+.hud-note { margin-top: 6px; color: rgba(255,255,255,.72); font: 500 11.5px/1.5 'Manrope', sans-serif; letter-spacing: 0; }
+@media (max-width: 700px) { .hud-row { grid-template-columns: 92px minmax(0, 1fr) 56px; } }

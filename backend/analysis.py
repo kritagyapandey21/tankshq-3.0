@@ -113,13 +113,22 @@ class SignalAnalyzer:
         comp = r["components"]
         agree = lambda x: round(max(0.0, min(100.0, 50 + 50 * x * d)), 1)
         oscillators = comp["rsi"] * 0.4 + comp["bollinger"] * 0.35 + comp["stoch_rsi"] * 0.25
+        osc_rsi, osc_bb, osc_sr = agree(comp["rsi"]), agree(comp["bollinger"]), agree(comp["stoch_rsi"])
+        confidence = r["confidence"]
+        if plus or reversion_only:
+            # For the snap-back engines the signal strength is simply the average of the three readings that decide
+            # it, so the number on screen can be checked against the bars. Capped at 99: never "certain".
+            confidence = round(min(99.0, (osc_rsi + osc_bb + osc_sr) / 3), 1)
         return {
             "symbol": symbol,
-            "confidence": r["confidence"],
+            "confidence": confidence,
             "direction": r["direction"],
             "price": pair_data["current_price"],
             "signals": {
-                "rsi": agree(oscillators),           # RSI + Bollinger + StochRSI (mean reversion)
+                "osc_rsi": osc_rsi,                  # the three snap-back readings, each 0-100 support for the call
+                "osc_bollinger": osc_bb,
+                "osc_stoch_rsi": osc_sr,
+                "rsi": agree(oscillators),           # RSI + Bollinger + StochRSI combined (kept for older pages)
                 "ema": agree(comp["ema"]),
                 "macd": agree(comp["macd"]),
                 "supertrend": agree(comp["supertrend"]),

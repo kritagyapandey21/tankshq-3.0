@@ -466,34 +466,44 @@ function renderSignalHistory() {
 
 // ── Signal Drivers HUD: radar + LED readouts, laid out for the engine that made the signal ──────────
 const HUD_CX = 130, HUD_CY = 125, HUD_R = 85, HUD_SEGS = 14, HUD_SEGS_LG = 28;
-const SNAP_BACK = { key: 'rsi', label: 'SNAP-BACK', sub: 'RSI · Bollinger · StochRSI' };
-const TREND_AXES = [
-    { key: 'supertrend', label: 'SUPERTREND', sub: 'Trend side' },
-    { key: 'ema', label: 'EMA', sub: 'Trend 9 / 21 / 50' },
-    { key: 'macd', label: 'MACD', sub: 'Momentum' },
+// v3 layouts: the three snap-back readings DECIDE the signal (radar + bars, averaged into SETUP STRENGTH);
+// Supertrend / EMA / MACD are MARKET CONTEXT shown as a trend direction, and trend steadiness is information only.
+const SNAP_AXES = [
+    { key: 'osc_rsi', label: 'RSI', sub: 'Overbought / oversold' },
+    { key: 'osc_bollinger', label: 'BOLLINGER', sub: 'Distance from average' },
+    { key: 'osc_stoch_rsi', label: 'STOCH RSI', sub: 'Fresh extreme' },
 ];
-const STRENGTH_ROW = { key: 'strength', label: 'STRENGTH', sub: 'How steady the trend is', info: true };
+const CONTEXT_ROWS = [
+    { key: 'supertrend', label: 'SUPERTREND', sub: 'Trend side', kind: 'trend' },
+    { key: 'ema', label: 'EMA', sub: '9 / 21 / 50', kind: 'trend' },
+    { key: 'macd', label: 'MACD', sub: 'Momentum', kind: 'trend' },
+    { key: 'strength', label: 'STEADINESS', sub: 'How smooth the move is', kind: 'info' },
+];
+const V3_BASE = {
+    axes: SNAP_AXES,
+    sections: [['WHAT DECIDES THE SIGNAL', SNAP_AXES], ['MARKET CONTEXT', CONTEXT_ROWS]],
+    confLabel: 'SETUP STRENGTH',
+    explain: true,
+};
 const HUD_LAYOUTS = {
     v2: {
         axes: [{ key: 'rsi', label: 'RSI', sub: 'Momentum' }, { key: 'ema', label: 'EMA', sub: 'Trend' }, { key: 'macd', label: 'MACD', sub: 'Direction' }],
-        extra: [],
-        note: '',
+        sections: null,
+        confLabel: 'CONFIDENCE',
+        explain: false,
         method: 'RSI measures momentum, EMA confirms the trend, and MACD validates direction. Their weighted agreement produces the final BUY or SELL signal.',
     },
     v3: {
-        axes: [SNAP_BACK, ...TREND_AXES], extra: [STRENGTH_ROW],
-        note: 'Bars show how much each reading supports this call (50% = neutral).',
-        method: 'TANIX AI 3.0 first measures how steady the market is (trend strength). In a steady trend it follows Supertrend, EMA and MACD; in a choppy market it uses the snap-back reading (RSI, Bollinger Bands and Stochastic RSI) and expects a short pullback. The pair with the clearest setup is chosen.',
+        ...V3_BASE,
+        method: 'TANIX AI 3.0 first checks how steady the market is. In a steady trend it follows Supertrend, EMA and MACD; in a choppy market it uses the snap-back readings (RSI, Bollinger Bands, Stochastic RSI) and expects a short pullback. Setup strength shows how clear the setup is, not a guaranteed result.',
     },
     'v3-reversion': {
-        axes: [SNAP_BACK, ...TREND_AXES], extra: [STRENGTH_ROW],
-        note: 'Bars show how much each reading supports this call (50% = neutral).',
-        method: 'TANIX AI 3.0 scans every pair for the most over-stretched move and expects a short pullback. The snap-back reading (RSI, Bollinger Bands and Stochastic RSI) decides BUY or SELL. Supertrend, EMA and MACD show the recent trend as context: a low trend score means the signal trades against that move on purpose.',
+        ...V3_BASE,
+        method: 'TANIX AI 3.0 scans every pair for the most over-stretched move and expects a short pullback. RSI, Bollinger Bands and Stochastic RSI decide the direction, and setup strength is their average. Supertrend, EMA and MACD show which way the price has been moving. Setup strength shows how clear the setup is, not a guaranteed result.',
     },
     'v3-reversion-plus': {
-        axes: [SNAP_BACK, ...TREND_AXES], extra: [STRENGTH_ROW],
-        note: 'Bars show how much each reading supports this call (50% = neutral).',
-        method: 'TANIX AI 3.0 scans every pair for the most over-stretched move and expects a short pullback. It only signals when RSI, Bollinger Bands and Stochastic RSI all agree. Supertrend, EMA and MACD show the recent trend as context: a low trend score means the signal trades against that move on purpose.',
+        ...V3_BASE,
+        method: 'TANIX AI 3.0 scans every pair for the most over-stretched move and expects a short pullback. It only signals when RSI, Bollinger Bands and Stochastic RSI all agree; setup strength is their average. Supertrend, EMA and MACD show which way the price has been moving. Setup strength shows how clear the setup is, not a guaranteed result.',
     },
 };
 const hudState = { layout: null, axes: [], values: {}, raf: null };
@@ -543,23 +553,33 @@ function hudSetLayout(engine) {
     });
     const rows = $('hudRows');
     rows.textContent = '';
-    [...layout.axes, ...layout.extra].forEach(ax => {
-        const row = document.createElement('div');
-        row.className = 'hud-row' + (ax.info ? ' is-info' : '');
-        const label = document.createElement('span');
-        label.textContent = ax.label;
-        const small = document.createElement('small');
-        small.textContent = ax.sub;
-        label.appendChild(small);
-        const segs = document.createElement('div');
-        segs.className = 'hud-segs'; segs.id = 'hudSeg-' + ax.key;
-        const pct = document.createElement('b');
-        pct.id = 'hudPct-' + ax.key; pct.textContent = '--%';
-        row.append(label, segs, pct);
-        rows.appendChild(row);
+    const sections = layout.sections || [[null, layout.axes]];
+    sections.forEach(([title, list]) => {
+        if (title) {
+            const h = document.createElement('div');
+            h.className = 'hud-section';
+            h.textContent = title;
+            rows.appendChild(h);
+        }
+        list.forEach(ax => {
+            const row = document.createElement('div');
+            row.className = 'hud-row' + (ax.kind ? ' is-' + ax.kind : '');
+            const label = document.createElement('span');
+            label.textContent = ax.label;
+            const small = document.createElement('small');
+            small.textContent = ax.sub;
+            label.appendChild(small);
+            const segs = document.createElement('div');
+            segs.className = 'hud-segs'; segs.id = 'hudSeg-' + ax.key;
+            const pct = document.createElement('b');
+            pct.id = 'hudPct-' + ax.key; pct.textContent = '--';
+            row.append(label, segs, pct);
+            rows.appendChild(row);
+        });
     });
-    $('hudNote').textContent = layout.note;
-    $('hudNote').hidden = !layout.note;
+    $('hudConfLabel').textContent = layout.confLabel;
+    $('hudNote').textContent = '';
+    $('hudNote').hidden = true;
     $('driverMethod').textContent = layout.method;
     hudDraw(hudState.values);
 }
@@ -598,22 +618,62 @@ function updateDriverHud(scores, direction, confidence, engine) {
     // the backend says which engine made the signal; older backends don't, so infer it from the scores
     hudSetLayout(engine || ('supertrend' in scores ? 'v3-reversion-plus' : 'v2'));
     const layout = HUD_LAYOUTS[hudState.layout];
-    const rows = [...layout.axes, ...layout.extra];
+    scores = { ...scores };
+    if (layout.sections && !('osc_rsi' in scores)) {           // older backend: only the combined snap-back score
+        scores.osc_rsi = scores.osc_bollinger = scores.osc_stoch_rsi = scores.rsi;
+    }
     const target = Object.fromEntries(layout.axes.map(ax => [ax.key, +scores[ax.key] || 0]));
-    // Use the backend's own confidence so this matches the signal toast; fall back to the average of the scores.
     const avg = Object.values(target).reduce((s, x) => s + x, 0) / Math.max(1, layout.axes.length);
-    const conf = Math.round(Number.isFinite(+confidence) && confidence !== null && confidence !== undefined ? +confidence : avg);
+    // snap-back engines: setup strength IS the average of the three deciding bars (the backend sends the same number)
+    const snapEngine = hudState.layout === 'v3-reversion' || hudState.layout === 'v3-reversion-plus';
+    const backend = Number.isFinite(+confidence) && confidence !== null && confidence !== undefined ? +confidence : avg;
+    const conf = Math.round(snapEngine ? Math.min(99, avg) : backend);
     const verdict = $('hudVerdict');
     verdict.textContent = direction || 'STANDBY';
     verdict.className = direction ? direction.toLowerCase() : '';
     $('hudConfluence').textContent = `${conf}%`;
     hudSegments('hudSegConf', HUD_SEGS_LG, conf);
-    rows.forEach(ax => {
+
+    const callDir = direction === 'BUY' ? 1 : -1;
+    const trendDirs = [];
+    (layout.sections ? layout.sections.flatMap(s => s[1]) : layout.axes).forEach(ax => {
         const v = +scores[ax.key];
         const pct = $('hudPct-' + ax.key);
-        if (pct) pct.textContent = Number.isFinite(v) ? `${Math.round(v)}%` : '--%';
-        hudSegments('hudSeg-' + ax.key, HUD_SEGS, Number.isFinite(v) ? v : 0);
+        const row = pct ? pct.parentElement : null;
+        if (!Number.isFinite(v)) {
+            if (pct) pct.textContent = '--';
+            hudSegments('hudSeg-' + ax.key, HUD_SEGS, 0);
+            return;
+        }
+        if (ax.kind === 'trend') {
+            // scores are "support for the call"; turn them back into which way the market has been moving
+            const strength = Math.min(100, Math.abs(v - 50) * 2);
+            const dir = strength < 15 ? 0 : (v >= 50 ? callDir : -callDir);
+            if (dir) trendDirs.push(dir);
+            if (pct) pct.textContent = dir > 0 ? '▲ UP' : dir < 0 ? '▼ DOWN' : 'FLAT';
+            if (row) { row.classList.toggle('is-up', dir > 0); row.classList.toggle('is-down', dir < 0); }
+            hudSegments('hudSeg-' + ax.key, HUD_SEGS, strength);
+        } else {
+            if (pct) pct.textContent = `${Math.round(v)}%`;
+            hudSegments('hudSeg-' + ax.key, HUD_SEGS, v);
+        }
     });
+
+    // one plain-language line that ties the numbers together
+    const note = $('hudNote');
+    if (layout.explain && direction) {
+        const up = trendDirs.filter(d => d > 0).length, down = trendDirs.filter(d => d < 0).length;
+        const trend = up > down ? 1 : down > up ? -1 : 0;
+        const word = d => (d > 0 ? 'UP' : 'DOWN');
+        let text;
+        if (trend === 0) text = 'The market has no clear trend, so the signal is based on the snap-back readings alone.';
+        else if (trend !== callDir) text = `Price has been moving ${word(trend)}. The snap-back readings say it has stretched too far, so the signal expects a short pullback ${trend > 0 ? 'down' : 'up'} (${direction}).`;
+        else text = `The trend (${word(trend)}) and the snap-back readings point the same way (${direction}).`;
+        note.textContent = text + (snapEngine ? ` Setup strength ${conf}% = average of RSI, Bollinger and Stoch RSI.` : '');
+        note.hidden = false;
+    } else {
+        note.hidden = true;
+    }
     // morph the radar polygon from its current shape to the new one
     const from = { ...hudState.values };
     const t0 = performance.now(), DURATION = 900;
