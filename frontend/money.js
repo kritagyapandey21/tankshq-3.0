@@ -2,7 +2,7 @@
 (function () {
     'use strict';
 
-    const BASE_PCT = 0.005;   // first stake: 0.5% of balance
+    const BASE_PCT = 0.01;    // first stake: 1% of balance
     const CAP_PCT = 0.5;      // a stake never exceeds 50% of the balance
     const WARN_PCT = 0.25;    // warn when a stake is this share of the balance
 
@@ -21,7 +21,7 @@
     const balanceAfter = n => state.trades.slice(0, n).reduce((b, t) => round2(b + (t.result === 'Win' ? t.amount : -t.amount)), state.start);
     const balance = () => balanceAfter(state.trades.length);
 
-    // Next recommended stake: double after a loss, otherwise 0.5% of the current balance (never below 0.5% of the start).
+    // Next recommended stake: double after a loss, otherwise 1% of the current balance (never below 1% of the start).
     function nextStake() {
         const bal = balance();
         const base = round2(state.start * BASE_PCT);
@@ -55,9 +55,9 @@
         $('recoValue').textContent = fmt(stake);
         const last = trades[trades.length - 1];
         $('recoNote').textContent = done ? 'Start a new session when you are ready.'
-            : !last ? 'First stake: 0.5% of your starting balance.'
+            : !last ? 'First stake: 1% of your starting balance.'
             : last.result === 'Loss' ? 'Last trade was a loss, so the stake is doubled.'
-            : 'Last trade was a win, so the stake is back to 0.5% of your balance.';
+            : 'Last trade was a win, so the stake is back to 1% of your balance.';
         const warn = $('riskWarn');
         const risky = !done && bal > 0 && stake / bal >= WARN_PCT;
         warn.hidden = !risky;
