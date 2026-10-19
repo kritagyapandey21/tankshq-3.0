@@ -591,6 +591,9 @@ async def get_signal(request: Request, background_tasks: BackgroundTasks) -> Sig
                     (symbol for symbol, label in reverse_map.items() if label == best_signal["symbol"]),
                     None,
                 )
+                if selected_symbol is None and best_signal["symbol"] in relay_candle_cache:
+                    # real-market pairs (e.g. AUDCHF) have no OTC display name, so use their own symbol
+                    selected_symbol = best_signal["symbol"]
                 signal["chart_candles"] = [
                     {"time": candle[0], "close": candle[1]}
                     for candle in relay_candle_cache.get(selected_symbol, [])[-60:]
