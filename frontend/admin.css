@@ -64,3 +64,4 @@
 .ad-tg-remove { min-height: 36px; padding: 0 14px; color: var(--ruby); font-size: 12px; font-weight: 700; border: 1px solid rgba(224,91,107,.45); border-radius: 10px; background: rgba(224,91,107,.08); cursor: pointer; }
 .ad-tg-remove:hover { color: #fff; background: var(--ruby); }
 .ad-tg-remove:disabled { opacity: .5; cursor: wait; }
+#lockBtn[hidden] { display: none; }

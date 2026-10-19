@@ -11,7 +11,7 @@ window.TANIX_CONFIG = {
     instagramUrl: 'https://www.instagram.com/tanishq_vairagi',
     // Learn Guide YouTube videos (paste your video links here)
     guideMoneyUrl: 'https://youtu.be/Z8-AmLW2NCY',
-    guideTanixUrl: 'https://youtube.com',
+    guideTanixUrl: 'https://youtu.be/NE-rd-nEqHM',
     guidePocketUrl: 'https://youtu.be/8HY2IvkKl-I?si=OvFFcZ_jQqyVhMLH',
     guideDepositUrl: 'https://youtu.be/c4rgdQnoTcg?si=JwJf6ZZqlzve2MiH',
 
