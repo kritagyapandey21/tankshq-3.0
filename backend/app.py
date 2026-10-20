@@ -47,6 +47,7 @@ from trader_store import (
     get_timezone, set_timezone, claim_session, touch_session, release_session,
     trader_for_token, get_telegram_joined, set_telegram_joined, was_replaced,
     list_telegram_joined, reset_telegram_joined,
+    record_terminal_use, list_terminal_usage,
 )
 
 # Configure logging
@@ -820,6 +821,15 @@ async def trader_flags(token: str = Depends(active_session_token)) -> Dict:
     return {"telegram_joined": bool(trader_id and get_telegram_joined(trader_id))}
 
 
+@app.post("/trader/terminal-visit")
+async def trader_terminal_visit(token: str = Depends(active_session_token)) -> Dict:
+    """Log that this trader opened TANIX 3.0 today (one record per trader per day, for the admin page)."""
+    trader_id = trader_for_token(token)
+    if not trader_id:
+        raise HTTPException(status_code=401, detail="Session expired. Please log in again.")
+    return {"logged": record_terminal_use(trader_id)}
+
+
 @app.post("/trader/telegram-joined")
 async def trader_telegram_joined(token: str = Depends(active_session_token)) -> Dict:
     """Remember that this trader opened the Telegram channel so the hub stops showing the card."""
@@ -951,6 +961,16 @@ async def admin_telegram_joins(request: Request, x_admin_key: Optional[str] = He
     require_admin(x_admin_key)
     items = list_telegram_joined()
     return {"count": len(items), "traders": items}
+
+
+@app.get("/admin/terminal-usage")
+@limiter.limit("60/minute")
+async def admin_terminal_usage(request: Request, days: int = 30, x_admin_key: Optional[str] = Header(None)) -> Dict:
+    """How many traders used TANIX 3.0 each day (India time), newest first."""
+    require_admin(x_admin_key)
+    days = max(1, min(int(days), 365))
+    data = list_terminal_usage(days)
+    return {"days": data, "total_visits": sum(d["count"] for d in data), "timezone": "Asia/Kolkata"}
 
 
 @app.post("/admin/telegram-joins/remove")

@@ -131,7 +131,9 @@
         });
         $('tab-performers').hidden = name !== 'performers';
         $('tab-telegram').hidden = name !== 'telegram';
+        $('tab-usage').hidden = name !== 'usage';
         if (name === 'telegram') loadTelegram();
+        if (name === 'usage') loadUsage();
     }
     document.querySelectorAll('.ad-tab').forEach(t => t.addEventListener('click', () => openTab(t.dataset.tab)));
 
@@ -183,6 +185,46 @@
     $('tgSearch').addEventListener('input', renderTelegram);
     $('tgRefresh').addEventListener('click', () => loadTelegram());
 
+    // ---------------------------------------------------------------- TANIX 3.0 usage (one record per trader per day)
+    const usStatus = (msg, kind) => { $('usStatus').textContent = msg || ''; $('usStatus').className = 'ad-status' + (kind ? ' ' + kind : ''); };
+
+    function indiaDate(daysAgo) {                       // days are counted in India time, like the server does
+        return new Date(Date.now() + 5.5 * 3600 * 1000 - daysAgo * 86400000).toISOString().slice(0, 10);
+    }
+
+    function renderUsage(data) {
+        const days = data.days || [];
+        const body = $('usBody');
+        body.textContent = '';
+        days.forEach(d => {
+            const tr = document.createElement('tr');
+            const date = document.createElement('td');
+            date.textContent = new Date(d.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+            const count = document.createElement('td'); count.textContent = String(d.count);
+            const ids = document.createElement('td');
+            ids.textContent = d.traders.map(t => t.trader_id).join(', ');
+            ids.className = 'us-ids';
+            tr.append(date, count, ids);
+            body.appendChild(tr);
+        });
+        const byDate = Object.fromEntries(days.map(d => [d.date, d.count]));
+        const today = byDate[indiaDate(0)] || 0;
+        $('usToday').textContent = String(today); $('usageToday').textContent = String(today);
+        $('usYesterday').textContent = String(byDate[indiaDate(1)] || 0);
+        $('usWeek').textContent = String([0, 1, 2, 3, 4, 5, 6].reduce((s, n) => s + (byDate[indiaDate(n)] || 0), 0));
+        $('usBest').textContent = String(days.reduce((m, d) => Math.max(m, d.count), 0));
+        $('usEmpty').hidden = days.length > 0;
+    }
+
+    async function loadUsage() {
+        usStatus('');
+        const r = await api('/admin/terminal-usage?days=' + encodeURIComponent($('usRange').value));
+        if (!r.ok) return usStatus(r.status === 403 ? 'Admin key rejected. Lock and sign in again.' : 'Could not load the usage list.', 'err');
+        renderUsage(r.body);
+    }
+    $('usRefresh').addEventListener('click', loadUsage);
+    $('usRange').addEventListener('change', loadUsage);
+
     // ---------------------------------------------------------------- sign in
     function show(unlocked) {
         loginCard.hidden = unlocked; editor.hidden = !unlocked; lockBtn.hidden = !unlocked;
@@ -195,7 +237,7 @@
         if (r.status === 403) { setKey(''); adminKey = ''; if (!quiet) { err.textContent = 'Wrong admin key (or the server has no ADMIN_KEY set).'; err.hidden = false; } return; }
         if (!r.ok) { if (!quiet) { err.textContent = 'Something went wrong. Try again.'; err.hidden = false; } return; }
         setKey(key); err.hidden = true;
-        show(true); load(r.body); loadTelegram();
+        show(true); load(r.body); loadTelegram(); loadUsage();
     }
 
     $('loginForm').addEventListener('submit', e => { e.preventDefault(); unlock($('adminKey').value.trim(), false); });

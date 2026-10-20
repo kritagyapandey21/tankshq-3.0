@@ -45,6 +45,16 @@ def _connect() -> sqlite3.Connection:
     )
     connection.execute(
         """
+        CREATE TABLE IF NOT EXISTS terminal_usage (
+            trader_id TEXT NOT NULL,
+            day TEXT NOT NULL,
+            first_at TEXT NOT NULL,
+            PRIMARY KEY (trader_id, day)
+        )
+        """
+    )
+    connection.execute(
+        """
         CREATE TABLE IF NOT EXISTS trader_flags (
             trader_id TEXT PRIMARY KEY,
             telegram_joined INTEGER NOT NULL DEFAULT 0,
@@ -178,3 +188,37 @@ def reset_telegram_joined(trader_id: str) -> bool:
     with _connect() as connection:
         cursor = connection.execute("DELETE FROM trader_flags WHERE trader_id = ?", (trader_id.casefold(),))
         return cursor.rowcount > 0
+
+
+# ---- TANIX 3.0 terminal usage: one row per trader per day, however many times they open it ----------------
+def _usage_day() -> str:
+    """Today's date in the site's time zone (India time), so 'a day' means the Indian calendar day."""
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    return datetime.now(ZoneInfo(DEFAULT_TIMEZONE)).date().isoformat()
+
+
+def record_terminal_use(trader_id: str) -> bool:
+    """Log that this trader used the terminal today. Returns True only the first time that day."""
+    from datetime import datetime, timezone
+    with _connect() as connection:
+        cursor = connection.execute(
+            "INSERT OR IGNORE INTO terminal_usage (trader_id, day, first_at) VALUES (?, ?, ?)",
+            (trader_id.casefold(), _usage_day(), datetime.now(timezone.utc).isoformat(timespec="seconds")),
+        )
+        return cursor.rowcount == 1
+
+
+def list_terminal_usage(days: int = 30) -> list:
+    """Newest day first: [{'date', 'count', 'traders': [{'trader_id', 'first_at'}]}] for the last `days` days."""
+    from datetime import datetime, timedelta
+    from zoneinfo import ZoneInfo
+    start = (datetime.now(ZoneInfo(DEFAULT_TIMEZONE)).date() - timedelta(days=max(1, days) - 1)).isoformat()
+    with _connect() as connection:
+        rows = connection.execute(
+            "SELECT day, trader_id, first_at FROM terminal_usage WHERE day >= ? ORDER BY day DESC, first_at ASC", (start,)
+        ).fetchall()
+    out = {}
+    for day, trader_id, first_at in rows:
+        out.setdefault(day, []).append({"trader_id": trader_id.upper(), "first_at": first_at})
+    return [{"date": d, "count": len(v), "traders": v} for d, v in sorted(out.items(), reverse=True)]

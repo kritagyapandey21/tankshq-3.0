@@ -1223,6 +1223,8 @@ async function requireSession() {
 
 async function initTerminal() {
     if (!(await requireSession())) return;
+    // usage log for the admin page: the server stores at most one record per trader per day
+    authenticatedFetch(`${API_BASE_URL}/trader/terminal-visit`, { method: 'POST', keepalive: true }).catch(() => {});
     bootApp();
 }
 

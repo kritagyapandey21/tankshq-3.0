@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="site.css?v=10">
     <link rel="stylesheet" href="winners.css?v=2">
-    <link rel="stylesheet" href="admin.css?v=3">
+    <link rel="stylesheet" href="admin.css?v=5">
 </head>
 <body>
 
@@ -49,6 +49,7 @@
             <nav class="ad-tabs" role="tablist" aria-label="Admin sections">
                 <button class="ad-tab is-active" type="button" role="tab" data-tab="performers" aria-selected="true">Best performers</button>
                 <button class="ad-tab" type="button" role="tab" data-tab="telegram" aria-selected="false">Telegram access <span class="ad-badge" id="tgCount">0</span></button>
+                <button class="ad-tab" type="button" role="tab" data-tab="usage" aria-selected="false">TANIX 3.0 usage <span class="ad-badge" id="usageToday">0</span></button>
             </nav>
 
             <div id="tab-performers" role="tabpanel">
@@ -103,12 +104,40 @@
                     <p class="ad-status" id="tgStatus" role="status"></p>
                 </section>
             </div>
+
+            <div id="tab-usage" role="tabpanel" hidden>
+                <div class="welcome" style="padding-top:40px">
+                    <p class="eyebrow">Admin</p>
+                    <h1>TANIX 3.0 <span class="gold-text">usage</span></h1>
+                    <p class="lede">Each trader is counted once per day, however many times they open TANIX 3.0. Days follow India time. The number on the tab is today's count.</p>
+                </div>
+                <section class="mt-usage-stats">
+                    <div class="glass us-stat"><span>Today</span><b id="usToday">0</b></div>
+                    <div class="glass us-stat"><span>Yesterday</span><b id="usYesterday">0</b></div>
+                    <div class="glass us-stat"><span>Last 7 days (visits)</span><b id="usWeek">0</b></div>
+                    <div class="glass us-stat"><span>Best day</span><b id="usBest">0</b></div>
+                </section>
+                <section class="glass ad-card">
+                    <div class="ad-tg-tools">
+                        <select id="usRange" aria-label="Period"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select>
+                        <button class="btn btn-ghost" id="usRefresh" type="button">Refresh</button>
+                    </div>
+                    <div class="ad-table-wrap">
+                        <table class="rule-table ad-tg-table">
+                            <thead><tr><th>Date</th><th>Traders</th><th>Trader IDs</th></tr></thead>
+                            <tbody id="usBody"></tbody>
+                        </table>
+                    </div>
+                    <p class="ad-note" id="usEmpty">No one has opened TANIX 3.0 yet.</p>
+                    <p class="ad-status" id="usStatus" role="status"></p>
+                </section>
+            </div>
         </div>
     </main>
 
     <script>window.API_BASE_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') ? 'http://localhost:8000' : '/api';</script>
     <script src="config.js?v=11"></script>
     <script src="performers.js?v=1"></script>
-    <script src="admin.js?v=3"></script>
+    <script src="admin.js?v=4"></script>
 </body>
 </html>
