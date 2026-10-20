@@ -192,38 +192,51 @@
         return new Date(Date.now() + 5.5 * 3600 * 1000 - daysAgo * 86400000).toISOString().slice(0, 10);
     }
 
-    function renderUsage(data) {
-        const days = data.days || [];
+    let usDays = [];     // [{date, count, traders:[{trader_id, first_at}]}] covering at least the last 7 days
+
+    function renderUsage() {
+        const range = parseInt($('usRange').value, 10) || 1;
+        const q = $('usSearch').value.trim().toUpperCase();
+        const from = indiaDate(range - 1);                       // first day inside the chosen period
         const body = $('usBody');
         body.textContent = '';
-        days.forEach(d => {
-            const tr = document.createElement('tr');
-            const date = document.createElement('td');
-            date.textContent = new Date(d.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-            const count = document.createElement('td'); count.textContent = String(d.count);
-            const ids = document.createElement('td');
-            ids.textContent = d.traders.map(t => t.trader_id).join(', ');
-            ids.className = 'us-ids';
-            tr.append(date, count, ids);
-            body.appendChild(tr);
+        let shown = 0;
+        usDays.filter(d => d.date >= from).forEach(d => {
+            d.traders.filter(t => !q || t.trader_id.includes(q)).forEach(t => {
+                const tr = document.createElement('tr');
+                const id = document.createElement('td'); id.textContent = t.trader_id;
+                const date = document.createElement('td');
+                date.textContent = new Date(d.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+                const at = document.createElement('td');
+                at.textContent = new Date(t.first_at).toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+                tr.append(id, date, at);
+                body.appendChild(tr);
+                shown += 1;
+            });
         });
-        const byDate = Object.fromEntries(days.map(d => [d.date, d.count]));
+        $('usEmpty').hidden = shown > 0;
+        $('usEmpty').textContent = q ? 'No Trader ID matches your search.' : 'No one has opened TANIX 3.0 in this period.';
+
+        // counters always cover today / yesterday / the last 7 days, whatever period is chosen for the table
+        const byDate = Object.fromEntries(usDays.map(d => [d.date, d.count]));
         const today = byDate[indiaDate(0)] || 0;
         $('usToday').textContent = String(today); $('usageToday').textContent = String(today);
         $('usYesterday').textContent = String(byDate[indiaDate(1)] || 0);
         $('usWeek').textContent = String([0, 1, 2, 3, 4, 5, 6].reduce((s, n) => s + (byDate[indiaDate(n)] || 0), 0));
-        $('usBest').textContent = String(days.reduce((m, d) => Math.max(m, d.count), 0));
-        $('usEmpty').hidden = days.length > 0;
+        $('usBest').textContent = String(usDays.reduce((m, d) => Math.max(m, d.count), 0));
     }
 
     async function loadUsage() {
         usStatus('');
-        const r = await api('/admin/terminal-usage?days=' + encodeURIComponent($('usRange').value));
+        const days = Math.max(7, parseInt($('usRange').value, 10) || 1);     // the counters need the last 7 days
+        const r = await api('/admin/terminal-usage?days=' + days);
         if (!r.ok) return usStatus(r.status === 403 ? 'Admin key rejected. Lock and sign in again.' : 'Could not load the usage list.', 'err');
-        renderUsage(r.body);
+        usDays = r.body.days || [];
+        renderUsage();
     }
     $('usRefresh').addEventListener('click', loadUsage);
     $('usRange').addEventListener('change', loadUsage);
+    $('usSearch').addEventListener('input', renderUsage);
 
     // ---------------------------------------------------------------- sign in
     function show(unlocked) {
