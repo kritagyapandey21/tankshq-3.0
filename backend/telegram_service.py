@@ -20,6 +20,7 @@ API_ID             = int(os.environ.get("TELEGRAM_API_ID", "0") or "0")
 API_HASH           = os.environ.get("TELEGRAM_API_HASH", "")
 SESSION_STRING     = os.environ.get("TELEGRAM_SESSION_STRING", "")
 PO_BOT_USERNAME    = "AffiliatePocketBot"
+MIN_BALANCE        = 10.0   # minimum current balance (USD) reported by the bot
 
 # When True, login is blocked instead of bypassed if Telegram is not configured.
 _REQUIRE_VERIFICATION = os.environ.get("REQUIRE_VERIFICATION", "false").lower() == "true"
@@ -61,7 +62,7 @@ async def _get_client():
 
 
 def _parse_reply(text: str) -> Dict:
-    """Parse PocketPartners bot response. Requires UID present and Sum of deposits > $50."""
+    """Parse PocketPartners bot response. Requires UID present, Sum of deposits >= $45 and Balance >= $10."""
     import re
 
     if not text:
@@ -80,10 +81,21 @@ def _parse_reply(text: str) -> Dict:
         if total_deposits < 45:
             return {
                 "found":   False,
-                "message": f"ACCESS DENIED — MINIMUM $45 DEPOSIT REQUIRED (yours: ${total_deposits:.2f})"
+                "message": f"ACCESS DENIED — MINIMUM $50 DEPOSIT REQUIRED (yours: ${total_deposits:.2f})"
             }
     else:
         return {"found": False, "message": "COULD NOT VERIFY DEPOSIT HISTORY"}
+
+    # Enforce minimum $10 current balance
+    balance_match = re.search(r'(?<![\w ])balance\s*:\s*\$?\s*(-?[\d,]+\.?\d*)', text, re.IGNORECASE)
+    if not balance_match:
+        return {"found": False, "message": "COULD NOT VERIFY BALANCE"}
+    balance = float(balance_match.group(1).replace(',', ''))
+    if balance < MIN_BALANCE:
+        return {
+            "found":   False,
+            "message": f"ACCESS DENIED — MINIMUM ${MIN_BALANCE:.2f} BALANCE REQUIRED (yours: ${balance:.2f})"
+        }
 
     return {"found": True, "message": "TRADER VERIFIED"}
 
@@ -113,7 +125,7 @@ async def verify_trader(trader_id: str) -> Dict:
                 await conv.send_message(str(trader_id))
                 reply = await conv.get_response(timeout=15)
                 raw = reply.message or ""
-                logger.info(f"Bot reply 1: {repr(raw[:200])}")
+                logger.info(f"Bot reply 1: {repr(raw[:500])}")
 
                 # Handle anti-robot captcha challenge
                 if "robot" in raw.lower() or "confirm" in raw.lower():
@@ -144,7 +156,7 @@ async def verify_trader(trader_id: str) -> Dict:
                             await conv.send_message(str(trader_id))
                             final_reply = await conv.get_response(timeout=15)
                             raw = final_reply.message or ""
-                            logger.info(f"Bot final reply: {repr(raw[:200])}")
+                            logger.info(f"Bot final reply: {repr(raw[:500])}")
 
                     except asyncio.TimeoutError:
                         # No response after click — re-send trader ID
